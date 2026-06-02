@@ -2,7 +2,7 @@
 
 LM Studio is the primary runtime used for all benchmarks in this repository.
 
-**Version tested:** [ to be recorded ]
+**Version tested:** [ to be recorded — find it in LM Studio under the top menu → **Help → About LM Studio** or in the title bar ]
 
 ---
 

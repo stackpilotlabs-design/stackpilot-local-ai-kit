@@ -22,10 +22,12 @@ Or download from [ollama.com](https://ollama.com).
 
 ```bash
 # Models relevant to this research:
-ollama run gemma3
+ollama run gemma4e4b        # confirm exact tag with: ollama search gemma4
 ollama run qwen2.5-coder
 ollama run deepseek-r1
 ```
+
+> Note: Ollama model tags do not always match LM Studio model names. Run `ollama search gemma4` to confirm the correct tag before testing. The primary model under test in this repo is **Gemma 4 E4B**, not Gemma 3.
 
 ---
 

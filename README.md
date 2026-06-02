@@ -13,7 +13,7 @@ Built by StackPilot Labs.
 | Storage | 1 TB SSD |
 | OS | macOS Tahoe |
 | Primary Runtime | LM Studio |
-| Last Updated | May 2026 |
+| Latest activity | See [EXPERIMENT-LOG.md](EXPERIMENT-LOG.md) |
 
 ---
 
@@ -63,3 +63,16 @@ This is not a generic setup guide. It is a structured research log.
 ### Gemma 4 E4B Running in LM Studio
 
 ![Gemma Running](assets/screenshots/lmstudio-gemma4-running.png)
+
+---
+
+## Contributing
+
+This is a single-machine research repo, but the methodology is designed to be reproducible. If you have an M-series MacBook and want to contribute results:
+
+1. **Read the methodology** → [`docs/00-methodology.md`](docs/00-methodology.md). All tests must follow this protocol to be comparable.
+2. **Use the benchmark prompts** → [`examples/benchmark-prompts.md`](examples/benchmark-prompts.md). Run the exact versioned prompts — do not paraphrase or modify them.
+3. **Record your results** using the entry template in [`docs/10-benchmarks.md`](docs/10-benchmarks.md). Include your machine spec, OS version, LM Studio version, quantisation, and all settings.
+4. **Open a pull request** with your results added to `docs/10-benchmarks.md` and a new entry in `EXPERIMENT-LOG.md`. Note your hardware clearly — results from different machines are welcome as long as they are labelled.
+
+Results from machines other than the M5 MacBook Air (16 GB) will be accepted but kept in a separate section to avoid mixing hardware configurations in the main comparison table.

@@ -39,17 +39,16 @@ Requirements:
 ```
 Refactor the following Python code. Improve readability, remove duplication, and add type hints. Do not change the function's external behaviour.
 
-```python
-def process(data):
-    result = []
-    for i in range(len(data)):
-        if data[i] > 0:
-            result.append(data[i] * 2)
-        elif data[i] < 0:
-            result.append(data[i] * -1)
-        else:
-            result.append(0)
-    return result
+    def process(data):
+        result = []
+        for i in range(len(data)):
+            if data[i] > 0:
+                result.append(data[i] * 2)
+            elif data[i] < 0:
+                result.append(data[i] * -1)
+            else:
+                result.append(0)
+        return result
 ```
 
 **What to look for:**
