@@ -39,7 +39,7 @@ Raw per-model benchmark data collected on the M5 MacBook Air (16 GB, macOS Tahoe
 
 ---
 
-### Gemma 4 E4B (Q4_K_M) — 2026-05-31
+### Gemma 4 E4B (Q4_K_M) — 2026-06-03
 
 | Metric | Value |
 |--------|-------|
@@ -49,8 +49,22 @@ Raw per-model benchmark data collected on the M5 MacBook Air (16 GB, macOS Tahoe
 | RAM usage (loaded, idle) | [ to be measured ] |
 | Startup time (cold) | [ to be measured ] |
 
-**Coding benchmark:** [ to be run ]
+**Coding benchmark:** PASS
+
 > Prompt: Coding Benchmark v1 from `examples/benchmark-prompts.md`
+
+> Notes:
+> - Correct recursive solution
+> - Included detailed docstring
+> - Included type hints (`Dict[str, Any]`)
+> - Included 4 assert-based test cases
+> - Correctly handled empty dictionary input
+> - Generated syntactically correct Python
+> - Output speed observed at ~33 tok/sec
+
+> Evidence:
+> - Screenshot: `assets/screenshots/gemma4-coding-benchmark-v1-1.png`
+> - Screenshot: `assets/screenshots/gemma4-coding-benchmark-v1-2.png`
 
 **Reasoning benchmark:** [ to be run ]
 > Prompt: Reasoning Benchmark v1 from `examples/benchmark-prompts.md`
@@ -58,7 +72,7 @@ Raw per-model benchmark data collected on the M5 MacBook Air (16 GB, macOS Tahoe
 **Refactoring benchmark:** [ to be run ]
 > Prompt: Refactoring Benchmark v1 from `examples/benchmark-prompts.md`
 
-**Verdict:** [ to be written after qualitative tests are complete ]
+**Verdict:** Early results are promising. Additional reasoning and refactoring benchmarks are required before a final qualitative assessment.
 
 ---
 
