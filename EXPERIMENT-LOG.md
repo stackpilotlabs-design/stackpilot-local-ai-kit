@@ -68,3 +68,48 @@ Each entry records what was tested, under what conditions, what was measured, an
 ---
 
 <!-- Add new entries above this line, in reverse-chronological order -->
+
+
+### 2026-06-03 — Gemma 4 E4B (Q4_K_M)
+
+**Runtime:** LM Studio  
+**Status:** Complete — benchmark suite completed
+
+**Measurements:**
+
+| Metric | Value |
+|--------|-------|
+| Coding benchmark speed | ~33 tok/sec |
+| Refactoring benchmark speed | ~32 tok/sec |
+| Reasoning benchmark speed | ~32 tok/sec |
+| Model size on disk | 6.33 GB |
+
+**Observations:**
+
+- Coding Benchmark v1: PASS
+- Refactoring Benchmark v1: PASS
+- Reasoning Benchmark v1: PASS
+- Generated syntactically correct Python code.
+- Produced correct refactoring with type hints and reduced duplication.
+- Correctly solved the benchmark reasoning prompt ("all but 9 die").
+- Performance remained consistently above 30 tok/sec across all benchmark categories.
+
+**Prompts used:**
+- Coding Benchmark v1
+- Refactoring Benchmark v1
+- Reasoning Benchmark v1
+
+Source: `examples/benchmark-prompts.md`
+
+**Evidence:**
+- `assets/screenshots/gemma4-coding-benchmark-v1-1.png`
+- `assets/screenshots/gemma4-coding-benchmark-v1-2.png`
+- `assets/screenshots/gemma4-refactoring-benchmark-v1-1.png`
+- `assets/screenshots/gemma4-refactoring-benchmark-v1-2.png`
+- `assets/screenshots/gemma4-reasoning-benchmark-v1.png`
+
+**Next:**
+- Measure RAM usage after model load.
+- Measure cold-start load time.
+- Benchmark Qwen on identical hardware and methodology.
+- Create first cross-model comparison entry.
