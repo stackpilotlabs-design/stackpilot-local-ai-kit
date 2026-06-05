@@ -6,6 +6,33 @@ Side-by-side comparison of models tested on the M5 MacBook Air (16 GB unified RA
 
 ---
 
+## Gemma 4 E4B vs Qwen3 4B
+
+Visual summary (MacBook Air M5, 16 GB — same hardware, same Benchmark v1 prompts, same methodology):
+
+![Gemma 4 E4B vs Qwen3 4B](../assets/comparisons/gemma4-e4b-vs-qwen3-4b-head-to-head.png)
+
+> Infographic uses rounded tok/s (33 vs 46) for display. Per-run values and ranges are in the table below.
+
+### Key findings
+
+| Category | Result |
+|----------|--------|
+| Coding Benchmark v1 | Tie (both PASS) |
+| Refactoring Benchmark v1 | Tie (both PASS) |
+| Reasoning Benchmark v1 | Tie (both PASS) |
+| Speed (tok/s) | **Qwen3 4B** (~39% faster; 46–50 vs 32–34) |
+| Model size on disk | **Qwen3 4B** (2.28 GB vs 6.33 GB) |
+| Coding output detail | **Gemma 4 E4B** (type hints, 4 asserts; Qwen more concise with 3 asserts) |
+
+### Conclusion
+
+- **Qwen3 4B** leads on throughput and disk footprint on this machine.
+- **Gemma 4 E4B** produced more thorough **Coding v1** output per benchmark notes; both models **PASS** all three categories.
+- **Not a declared overall quality winner** — only Pass/Fail was applied; no separate quality rubric beyond v1 prompt notes.
+
+---
+
 ## Head-to-Head Summary (2026-06-05)
 
 Both models completed **Benchmark v1** (Coding, Refactoring, Reasoning) on identical prompts.
@@ -24,7 +51,7 @@ Speed column order: Coding / Refactoring / Reasoning — values from LM Studio s
 **Confirmed from benchmark notes and screenshots:**
 
 - Both models passed all three Benchmark v1 categories on 16 GB Apple Silicon hardware.
-- Qwen3 4B generated **~40% faster** than Gemma 4 E4B across comparable runs (46–50 vs 32–34 tok/s).
+- Qwen3 4B generated **~39% faster** than Gemma 4 E4B across comparable runs (46–50 vs 32–34 tok/s; infographic rounds to 33 vs 46).
 - On **Coding v1**, Gemma included type hints and **4** assert test cases; Qwen produced **more concise** output with **3** assert cases (noted in `10-benchmarks.md`).
 - Qwen3 4B uses **2.7× less disk space** (2.28 GB vs 6.33 GB) while delivering higher tok/s on this machine.
 - Qwen3 4B required **Think mode disabled** in LM Studio for reliable benchmark completion; Think mode enabled caused prolonged generation without a final answer on the initial coding attempt.
@@ -45,6 +72,7 @@ Speed column order: Coding / Refactoring / Reasoning — values from LM Studio s
 
 | Source | Link |
 |--------|------|
+| Visual comparison | [`assets/comparisons/gemma4-e4b-vs-qwen3-4b-head-to-head.png`](../assets/comparisons/gemma4-e4b-vs-qwen3-4b-head-to-head.png) |
 | Raw benchmark data | [`docs/10-benchmarks.md`](10-benchmarks.md) |
 | Session log | [`EXPERIMENT-LOG.md`](../EXPERIMENT-LOG.md) |
 | Benchmark prompts | [`examples/benchmark-prompts.md`](../examples/benchmark-prompts.md) |
