@@ -34,8 +34,8 @@ This is not a generic setup guide. It is a structured research log.
 
 | Model | Status | tok/s | Notes |
 |-------|--------|-------|-------|
-| Gemma 4 E4B (Q4_K_M) | ✅ Partially tested | 33.6 | Speed confirmed. Qualitative tests pending. |
-| Qwen | 🔜 Planned | — | — |
+| Gemma 4 E4B (Q4_K_M) | ✅ Benchmark suite complete | 33.6 | All 3 v1 prompts passed. |
+| Qwen3 4B (MLX 4-bit) | ✅ Benchmark suite complete | 46–50 | All 3 v1 prompts passed. Think mode disabled. |
 | DeepSeek | 🔜 Planned | — | — |
 
 ---
@@ -48,7 +48,7 @@ This is not a generic setup guide. It is a structured research log.
 | 01 | [LM Studio](docs/01-lmstudio.md) | Runtime setup and test configuration |
 | 02 | [Ollama](docs/02-ollama.md) | Secondary runtime notes |
 | 03 | [Gemma](docs/03-gemma.md) | Gemma 4 E4B model notes |
-| 04 | [Qwen](docs/04-qwen.md) | Qwen model notes (not yet tested) |
+| 04 | [Qwen3 4B](docs/04-qwen.md) | Qwen3 4B model notes (benchmark suite complete) |
 | 05 | [DeepSeek](docs/05-deepseek.md) | DeepSeek model notes (planned) |
 | 06 | [Cursor Integration](docs/06-cursor-integration.md) | Connecting local models to Cursor IDE |
 | 07 | [M5 Hardware Notes](docs/07-macbook-air-guide.md) | M5-specific performance observations |
@@ -63,6 +63,10 @@ This is not a generic setup guide. It is a structured research log.
 ### Gemma 4 E4B Running in LM Studio
 
 ![Gemma Running](assets/screenshots/lmstudio-gemma4-running.png)
+
+### Qwen3 4B Installed in LM Studio
+
+![Qwen3 Installed](assets/screenshots/qwen3-installed-lmstudio.png)
 
 ---
 

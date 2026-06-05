@@ -102,4 +102,77 @@ Raw per-model benchmark data collected on the M5 MacBook Air (16 GB, macOS Tahoe
 
 ---
 
+### Qwen3 4B (MLX 4-bit) — 2026-06-04
+
+| Metric | Value |
+|--------|-------|
+| LM Studio ID | `qwen/qwen3-4b` |
+| Quantisation | MLX 4-bit |
+| Size on disk | 2.28 GB |
+| Tokens per second | **46–50** (46.84 coding, 46.02 refactoring, 49.53 reasoning) |
+| RAM usage (loaded, idle) | [ to be measured ] |
+| Startup time (cold) | [ to be measured ] |
+
+**Installation & environment:** Downloaded and loaded via LM Studio (MLX 4-bit build). Think mode **disabled** for benchmark runs.
+
+> Evidence:
+> - [Qwen3 installed in LM Studio](../assets/screenshots/qwen3-installed-lmstudio.png)
+> - [Qwen3 loaded — local server running](../assets/screenshots/qwen3-loaded-lmstudio.png)
+
+**Coding benchmark:** PASS
+> Prompt: Coding Benchmark v1 from `examples/benchmark-prompts.md`
+
+> Notes:
+> - Correct recursive solution
+> - Included docstring
+> - Included 3 assert-based test cases
+> - Correctly handled nested dictionaries
+> - Correctly handled empty dictionary input
+> - Generated syntactically correct Python
+> - More concise output than Gemma 4 E4B
+> - Output speed observed at 46.84 tok/sec (LM Studio stats bar)
+
+> Additional observation:
+> - Think mode **enabled** caused prolonged token generation without producing a final answer
+> - Model was ejected and reloaded; benchmark completed with Think mode **disabled**
+
+> Evidence:
+> - [Coding benchmark output (Part 1)](../assets/screenshots/qwen3-coding-benchmark-v1-1.png)
+> - [Coding benchmark output (Part 2)](../assets/screenshots/qwen3-coding-benchmark-v1-2.png)
+
+
+**Refactoring benchmark:** PASS
+> Prompt: Refactoring Benchmark v1 from `examples/benchmark-prompts.md`
+
+> Notes:
+> - Added type hints
+> - Improved variable naming
+> - Added explanatory docstring
+> - Preserved original behaviour
+> - Improved readability
+> - Reduced code complexity
+> - Replaced index-based loop with direct iteration (`for number in data`)
+> - Output speed observed at 46.02 tok/sec (LM Studio stats bar)
+
+> Evidence:
+> - [Refactoring benchmark output (Part 1)](../assets/screenshots/qwen3-refactoring-benchmark-v1-1.png)
+> - [Refactoring benchmark output (Part 2)](../assets/screenshots/qwen3-refactoring-benchmark-v1-2.png)
+
+**Reasoning benchmark:** PASS
+> Prompt: Reasoning Benchmark v1 from `examples/benchmark-prompts.md`
+
+> Notes:
+> - Correctly interpreted "all but 9 die"
+> - Returned correct answer (9)
+> - Provided step-by-step reasoning before final answer
+> - Did not fall for the common 17 − 9 = 8 trap
+> - Output speed observed at 49.53 tok/sec (LM Studio stats bar)
+
+> Evidence:
+> - [Reasoning benchmark output](../assets/screenshots/qwen3-reasoning-benchmark-v1.png)
+
+**Verdict:** Qwen3 4B passed all 3 benchmark categories (Coding, Refactoring, and Reasoning) on a MacBook Air M5 (16 GB) running LM Studio with Think mode disabled. Generation speed ranged from 46–50 tok/sec across runs — consistently faster than Gemma 4 E4B (~32–34 tok/sec) on identical prompts. Think mode must remain disabled for reliable benchmark completion on this model.
+
+---
+
 <!-- Add new model entries above this line -->

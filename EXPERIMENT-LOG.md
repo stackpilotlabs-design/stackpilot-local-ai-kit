@@ -111,5 +111,64 @@ Source: `examples/benchmark-prompts.md`
 **Next:**
 - Measure RAM usage after model load.
 - Measure cold-start load time.
-- Benchmark Qwen on identical hardware and methodology.
+- Benchmark Qwen3 4B on identical hardware and methodology.
 - Create first cross-model comparison entry.
+
+---
+
+### 2026-06-04 — Qwen3 4B (MLX 4-bit)
+
+**Runtime:** LM Studio  
+**Status:** Complete — all 3 Benchmark v1 prompts passed
+
+**Model details:**
+
+| Field | Value |
+|-------|-------|
+| LM Studio ID | `qwen/qwen3-4b` |
+| Architecture | `qwen3` |
+| Quantisation | MLX 4-bit |
+| Size on disk | 2.28 GB |
+| Publisher | `lmstudio-community` |
+
+**Measurements:**
+
+| Metric | Value |
+|--------|-------|
+| Coding benchmark speed | 46.84 tok/sec |
+| Refactoring benchmark speed | 46.02 tok/sec |
+| Reasoning benchmark speed | 49.53 tok/sec |
+| Coding benchmark result | PASS |
+| Refactoring benchmark result | PASS |
+| Reasoning benchmark result | PASS |
+
+**Observations:**
+
+- Model downloaded, loaded, and local server started in LM Studio.
+- All benchmarks run with Think mode **disabled**.
+- Think mode **enabled** (initial coding attempt) caused prolonged generation without a final answer; model ejected and reloaded.
+- Coding Benchmark v1: PASS — recursive solution, docstring, 3 assert test cases.
+- Refactoring Benchmark v1: PASS — type hints, docstring, direct iteration, behaviour preserved.
+- Reasoning Benchmark v1: PASS — correct answer (9), step-by-step reasoning, avoided 17−9=8 trap.
+- Generation speed consistently 46–50 tok/sec across all three runs.
+
+**Prompts used:**
+- Coding Benchmark v1
+- Refactoring Benchmark v1
+- Reasoning Benchmark v1
+
+Source: `examples/benchmark-prompts.md`
+
+**Evidence:**
+- `assets/screenshots/qwen3-installed-lmstudio.png`
+- `assets/screenshots/qwen3-loaded-lmstudio.png`
+- `assets/screenshots/qwen3-coding-benchmark-v1-1.png`
+- `assets/screenshots/qwen3-coding-benchmark-v1-2.png`
+- `assets/screenshots/qwen3-refactoring-benchmark-v1-1.png`
+- `assets/screenshots/qwen3-refactoring-benchmark-v1-2.png`
+- `assets/screenshots/qwen3-reasoning-benchmark-v1.png`
+
+**Next:**
+- Measure RAM usage and cold-start load time.
+- Benchmark DeepSeek-R1 7B on identical hardware and methodology.
+- Create cross-model comparison entry in `docs/08-model-comparison.md`.

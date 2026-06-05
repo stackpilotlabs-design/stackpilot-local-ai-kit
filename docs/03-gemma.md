@@ -1,6 +1,6 @@
 # Gemma 4 E4B
 
-> **Test status:** Partially tested — generation speed confirmed. Qualitative benchmark tests pending.
+> **Test status:** Benchmark suite complete — all 3 Benchmark v1 prompts passed.
 >
 > See [`docs/10-benchmarks.md`](10-benchmarks.md) for raw results and [`EXPERIMENT-LOG.md`](../EXPERIMENT-LOG.md) for session notes.
 
@@ -23,7 +23,7 @@ Gemma 4 E4B is a Mixture-of-Experts (MoE) model from Google. "E4B" refers to app
 |--------|-------|
 | Quantisation | Q4_K_M |
 | Size on disk | 6.33 GB |
-| Tokens per second | 33.6 |
+| Tokens per second | 32–34 (33.6 initial; ~32–33 across v1 suite) |
 | RAM usage (loaded, idle) | [ to be measured ] |
 | Startup time (cold) | [ to be measured ] |
 
@@ -35,9 +35,9 @@ Gemma 4 E4B is a Mixture-of-Experts (MoE) model from Google. "E4B" refers to app
 
 | Test | Result | Notes |
 |------|--------|-------|
-| Coding benchmark | [ to be run ] | — |
-| Reasoning benchmark | [ to be run ] | — |
-| Refactoring benchmark | [ to be run ] | — |
+| Coding benchmark | PASS | ~33 tok/s |
+| Refactoring benchmark | PASS | ~32 tok/s |
+| Reasoning benchmark | PASS | ~32 tok/s |
 
 ---
 
@@ -54,15 +54,14 @@ Gemma 4 E4B is a Mixture-of-Experts (MoE) model from Google. "E4B" refers to app
 
 > Updated as benchmark sessions are completed. All notes are from actual use on this machine.
 
-- 33.6 tok/s measured during a standard generation in LM Studio.
-- [ further observations to be added ]
+- 33.6 tok/s measured during initial speed test; ~32–34 tok/s across Benchmark v1 suite.
+- All three Benchmark v1 prompts passed. See [`docs/10-benchmarks.md`](10-benchmarks.md) for evidence.
 
 ---
 
 ## What to Test Next
 
-- [ ] Run Coding Benchmark v1 prompt and record result
-- [ ] Run Reasoning Benchmark v1 prompt and record result
+- [x] Run Coding, Refactoring, and Reasoning Benchmark v1 prompts
 - [ ] Measure RAM at idle after load
 - [ ] Measure cold startup time
-- [ ] Note any consistent behavioural patterns (verbosity, refusal, hallucination tendencies)
+- [ ] Compare side-by-side with Qwen3 4B in `docs/08-model-comparison.md`

@@ -10,8 +10,8 @@ Side-by-side comparison of models tested on the M5 MacBook Air (16 GB unified RA
 
 | Model | Quantisation | Disk Size | tok/s | RAM (loaded) | Status |
 |-------|-------------|-----------|-------|-------------|--------|
-| Gemma 4 E4B | Q4_K_M | 6.33 GB | **33.6** | [ to be measured ] | ✅ Partially tested |
-| Qwen 2.5 Coder 7B | Q4_K_M | [ — ] | [ not yet tested ] | [ not yet tested ] | 🔜 Planned |
+| Gemma 4 E4B | Q4_K_M | 6.33 GB | **33.6** | [ to be measured ] | ✅ Benchmark suite complete |
+| Qwen3 4B | MLX 4-bit | 2.28 GB | **46–50** | [ to be measured ] | ✅ Benchmark suite complete |
 | DeepSeek-R1 7B | Q4_K_M | [ — ] | [ not yet tested ] | [ not yet tested ] | 🔜 Planned |
 
 ---
@@ -22,8 +22,8 @@ Side-by-side comparison of models tested on the M5 MacBook Air (16 GB unified RA
 
 | Model | Coding | Reasoning | Refactoring | Status |
 |-------|--------|-----------|-------------|--------|
-| Gemma 4 E4B | [ to be run ] | [ to be run ] | [ to be run ] | 🔜 Prompts pending |
-| Qwen 2.5 Coder 7B | [ not yet tested ] | [ not yet tested ] | [ not yet tested ] | 🔜 Planned |
+| Gemma 4 E4B | PASS | PASS | PASS | ✅ Complete |
+| Qwen3 4B | PASS | PASS | PASS | ✅ Complete |
 | DeepSeek-R1 7B | [ not yet tested ] | [ not yet tested ] | [ not yet tested ] | 🔜 Planned |
 
 ---
@@ -33,7 +33,7 @@ Side-by-side comparison of models tested on the M5 MacBook Air (16 GB unified RA
 | Model | Startup Time |
 |-------|-------------|
 | Gemma 4 E4B | [ to be measured ] |
-| Qwen 2.5 Coder 7B | [ not yet tested ] |
+| Qwen3 4B | [ not yet tested ] |
 | DeepSeek-R1 7B | [ not yet tested ] |
 
 ---
