@@ -693,3 +693,312 @@ Any application that makes HTTP requests can be connected to a local AI runtime.
 Model selection and detailed benchmark analysis are covered in depth in Chapters 5, 6, and 7. Chapter 5 compares Gemma 4 E4B and Qwen3 4B directly. Chapter 6 documents the benchmarking methodology used to evaluate them. Chapter 7 presents the results with full evidence.
 
 The next chapter examines the models themselves — what Gemma 4 E4B and Qwen3 4B are actually capable of, where each one falls short, and how to choose between them for a specific task.
+
+
+## Chapter 5 — Choosing the Right Model
+
+### Why Model Choice Matters More Than Hardware
+
+Most beginners spend a lot of time thinking about hardware.
+
+Will my machine be fast enough? Do I need more RAM? Would a more powerful chip make a significant difference?
+
+Hardware matters — Chapter 2 established where the real limits are. But in practice, model selection has a larger impact on whether local AI is useful in day-to-day work.
+
+Two models running on identical hardware can produce dramatically different results. One might be fast enough to feel interactive; another might be slow enough that waiting for a response becomes friction. One might produce thorough, well-structured code; another might produce concise but equally correct output. One might require specific configuration to work reliably at all.
+
+The benchmark research conducted for this guide illustrates this directly. On the same MacBook Air M5 with 16 GB of unified memory, Gemma 4 E4B generates at 32–34 tokens per second while Qwen3 4B generates at 46–50 tokens per second — using the same LM Studio interface, on identical prompts. That difference is noticeable in real use.
+
+Model selection is also where most beginners make avoidable mistakes. Downloading a model that is too large for available memory, choosing a quantization format that performs poorly on Apple Silicon, enabling a model mode that produces unreliable output — these are all model decisions, not hardware decisions.
+
+Understanding the models available, what each is good at, and how to evaluate them is the most practical skill a local AI beginner can develop.
+
+---
+
+### Understanding Model Families
+
+The local AI ecosystem is built around a small number of model families developed by different research organisations. Each family has a distinct character.
+
+#### Gemma
+
+Gemma is developed by Google DeepMind.
+
+The Gemma family is known for producing thorough, well-structured output. Models tend to include more explanatory content in their responses — documentation, type hints, detailed test coverage. Gemma models run reliably in GGUF format on LM Studio and require no special configuration.
+
+#### Qwen
+
+Qwen is developed by Alibaba's Qwen team.
+
+The Qwen family is notable for producing fast, compact, and highly capable models at small parameter counts. Qwen3 4B is particularly remarkable for its size-to-capability ratio — competitive coding and reasoning results at 2.28 GB.
+
+Qwen models have an MLX variant available, which runs natively optimised on Apple Silicon and delivers higher throughput than equivalent GGUF builds on M-series chips.
+
+One important quirk: Qwen3 includes a Think mode designed for extended reasoning. In the benchmark research for this guide, Think mode enabled caused prolonged generation without a final answer. Think mode should be disabled for general use.
+
+#### Llama
+
+Llama is developed by Meta.
+
+The Llama family is one of the most widely used open-weight model families and has a large ecosystem of fine-tuned variants. Many specialised models — for coding, instruction following, and specific domains — are built on Llama base models. Widely available in GGUF format and reliable on Apple Silicon.
+
+#### DeepSeek
+
+DeepSeek models are developed by DeepSeek AI.
+
+The DeepSeek family has attracted attention for strong reasoning capabilities, particularly the DeepSeek-R1 series. These models are planned for future benchmarks in this guide but have not yet been tested on the research hardware. Models in the DeepSeek family tend to be larger than 4B-class models and require more RAM.
+
+#### Mistral
+
+Mistral is developed by Mistral AI.
+
+The Mistral family produces compact, efficient models with strong general-purpose performance. Widely adopted for instruction following and available in many GGUF variants suitable for Apple Silicon.
+
+---
+
+### Case Study: Gemma 4 E4B
+
+#### Overview
+
+Gemma 4 E4B is a 4-billion-parameter model from Google DeepMind, benchmarked in Q4_K_M quantization format via LM Studio on the MacBook Air M5 (16 GB).
+
+| Metric | Value |
+|---|---|
+| Format | GGUF Q4_K_M |
+| Disk size | 6.33 GB |
+| Generation speed | 32–34 tok/s (~33.6 measured) |
+| LM Studio ID | `google/gemma-4-e4b` |
+
+#### Strengths
+
+**Thorough output.** On Coding Benchmark v1, Gemma 4 E4B produced a correct recursive solution with type hints (`Dict[str, Any]`), a detailed docstring, 4 assert-based test cases, and correct handling of empty dictionary inputs. This is noticeably more thorough output than a function that works but lacks supporting documentation and tests.
+
+**Reliable refactoring.** On Refactoring Benchmark v1, Gemma added type hints, replaced an index-based loop with direct iteration, removed duplication using a list comprehension, added an explanatory docstring, preserved original behaviour, and included a verification example with an assertion. Every benchmark checklist item was addressed.
+
+**Strong reasoning.** On Reasoning Benchmark v1 — a natural language logic problem designed to catch the common `17 − 9 = 8` trap — Gemma correctly returned 9 with step-by-step reasoning. It did not fall for the common mistake.
+
+**Stable behaviour.** No configuration surprises. Load the model in LM Studio, send the prompt, receive a complete and correct response. No special settings or workarounds were required.
+
+#### Weaknesses
+
+**Larger disk footprint.** At 6.33 GB, Gemma 4 E4B uses approximately 2.7 times more disk space than Qwen3 4B. For users with limited storage this is a meaningful constraint.
+
+**Slower generation.** At 32–34 tok/s, Gemma is noticeably slower than Qwen3 4B on the same hardware. For short prompts this is rarely a problem; for longer generation tasks the difference accumulates.
+
+**RAM footprint not yet measured.** The loaded memory usage has not been formally recorded in this research. It is anticipated to be higher than Qwen3 4B given the larger file size.
+
+#### Benchmark Results
+
+| Benchmark | Result | Notes |
+|---|---|---|
+| Coding v1 | PASS | Type hints, docstring, 4 asserts, handles edge cases |
+| Refactoring v1 | PASS | Full checklist addressed, list comprehension, verification |
+| Reasoning v1 | PASS | Correct answer (9), step-by-step, avoided common trap |
+| Speed | 32–34 tok/s | Consistent across all three benchmark runs |
+
+#### Ideal Use Cases
+
+* Coding assistance where thoroughness and documentation quality matter
+* Tasks where detailed, well-explained output is preferred over speed
+* Users who value stable, predictable behaviour without configuration
+* Learning workflows where seeing complete examples is more valuable than fast responses
+
+---
+
+### Case Study: Qwen3 4B
+
+#### Overview
+
+Qwen3 4B is a 4-billion-parameter model from Alibaba's Qwen team, benchmarked in MLX 4-bit format via LM Studio on the MacBook Air M5 (16 GB).
+
+| Metric | Value |
+|---|---|
+| Format | MLX 4-bit |
+| Disk size | 2.28 GB |
+| Generation speed | 46–50 tok/s (46.84 / 46.02 / 49.53 per run) |
+| LM Studio ID | `qwen/qwen3-4b` |
+
+#### Strengths
+
+**Significantly faster.** Qwen3 4B generated at 46–50 tok/s across all three benchmark runs — approximately 39% faster than Gemma 4 E4B on identical prompts and hardware. At this speed, responses feel noticeably more interactive.
+
+**Compact footprint.** At 2.28 GB, Qwen3 4B is less than half the size of Gemma 4 E4B. It loads faster, takes up less storage, and leaves more headroom for other applications to run concurrently.
+
+**Apple Silicon optimised.** The MLX 4-bit format runs natively on Apple Silicon using Apple's MLX framework. This is a significant contributor to the higher throughput compared to GGUF on the same machine.
+
+**Capable across all benchmark categories.** Correct recursive solution on Coding v1 with docstring and 3 assert-based test cases. Type hints, improved naming, and direct iteration on Refactoring v1. Correct step-by-step reasoning on Reasoning v1.
+
+#### Weaknesses
+
+**Think mode must be disabled.** Qwen3 4B includes a Think mode designed for extended chain-of-thought reasoning. In the benchmark research for this guide, enabling Think mode on the initial Coding v1 attempt caused prolonged token generation without producing a final answer. The model was ejected and reloaded; the benchmark was completed with Think mode disabled.
+
+**Think mode should be disabled for general use on this hardware.**
+
+**More concise output.** On Coding v1, Qwen produced 3 assert cases compared to Gemma's 4, and the overall output was more concise. For tasks where completeness and thoroughness matter, this difference is worth considering.
+
+**Format caveat.** Qwen3 4B runs as MLX 4-bit while Gemma 4 E4B runs as GGUF Q4_K_M. The observed speed difference reflects both the model and the format and runtime. This is not a single-variable comparison.
+
+#### Think Mode — Practical Guidance
+
+Qwen3's Think mode is designed to improve reasoning on complex problems by running an internal reasoning chain before producing the final answer. In principle, this is useful for difficult multi-step problems.
+
+In practice, on a MacBook Air M5 (16 GB), Think mode enabled can cause the model to generate extensively without reaching a conclusion — particularly on longer or more structured prompts.
+
+For everyday tasks — coding, refactoring, summarisation, chat — disable Think mode in LM Studio before running prompts. The setting is visible in the model parameters panel in LM Studio's chat interface.
+
+#### Benchmark Results
+
+| Benchmark | Result | Notes |
+|---|---|---|
+| Coding v1 | PASS | Correct solution, docstring, 3 asserts, handles edge cases |
+| Refactoring v1 | PASS | Type hints, naming improvements, docstring, direct iteration |
+| Reasoning v1 | PASS | Correct answer (9), step-by-step, avoided common trap |
+| Speed | 46–50 tok/s | Measured: 46.84 / 46.02 / 49.53 across three runs |
+
+#### Ideal Use Cases
+
+* Tasks where speed and responsiveness matter more than output completeness
+* Users with limited storage (works well on tighter disk budgets)
+* Interactive coding assistance with rapid iteration
+* Daily local AI use where volume of prompts is high
+* Users comfortable managing Think mode settings
+
+---
+
+### Head-to-Head Comparison
+
+Both models were tested on identical Benchmark v1 prompts using the same methodology on a MacBook Air M5 (16 GB). All figures below are from confirmed measurements.
+
+> **Figure 5.1** — Gemma 4 E4B vs Qwen3 4B visual summary.
+> *(Asset: `assets/comparisons/gemma4-e4b-vs-qwen3-4b-head-to-head.png`)*
+
+#### Core Metrics
+
+| | Gemma 4 E4B | Qwen3 4B |
+|---|---|---|
+| Format | GGUF Q4_K_M | MLX 4-bit |
+| Disk size | 6.33 GB | 2.28 GB |
+| Generation speed | 32–34 tok/s | 46–50 tok/s |
+| Coding v1 | PASS | PASS |
+| Refactoring v1 | PASS | PASS |
+| Reasoning v1 | PASS | PASS |
+| Output style | More thorough | More concise |
+| Configuration | None required | Disable Think mode |
+
+#### Coding Output Detail
+
+| | Gemma 4 E4B | Qwen3 4B |
+|---|---|---|
+| Test cases | 4 assert cases | 3 assert cases |
+| Type hints | Yes (`Dict[str, Any]`) | Yes |
+| Docstring | Yes, detailed | Yes |
+| Edge case handling | Yes | Yes |
+
+#### What the Numbers Mean
+
+**Speed.** Qwen3 4B is approximately 39% faster. Over a long working session with many prompts, this difference is noticeable. Short prompts may not reveal the gap; longer generation tasks will.
+
+**Size.** Qwen3 4B is 2.7 times smaller. On a machine with limited storage, this difference may determine whether the model fits alongside other models and files. On a 16 GB system, both models load comfortably.
+
+**Quality.** Both models passed all three benchmark categories. Gemma produced more thorough coding output with more test cases and more detailed documentation. Qwen produced correct, working output more quickly. Neither approach is objectively superior — the preferred style depends on the task.
+
+**Important caveat.** These models use different formats and runtimes. Speed and size differences reflect both model design and the format choice (GGUF vs MLX). This is not a single-variable controlled test.
+
+---
+
+### Which Model Should You Choose?
+
+There is no universally correct answer. The right choice depends on what you are trying to do.
+
+#### Beginners
+
+Start with Qwen3 4B.
+
+It is smaller, faster, and takes less storage. The only required configuration step is disabling Think mode. For someone exploring local AI for the first time, the faster responses and lower disk footprint reduce friction.
+
+If you have 50 GB or more of free storage and want more thorough output from the start, Gemma 4 E4B is also a reasonable first choice.
+
+#### Developers
+
+Try both.
+
+Gemma 4 E4B produces more complete coding output — type hints, more test cases, verification examples. If you are using local AI for code generation and output completeness matters more than speed, Gemma may serve you better.
+
+Qwen3 4B is better suited for interactive coding assistance where fast responses for shorter tasks are more valuable — function drafts, quick explanations, simple refactors.
+
+#### Students
+
+Qwen3 4B is the more practical starting point. It loads faster, responds faster, and leaves room to run other applications alongside it. For learning and experimentation, throughput matters more than output depth.
+
+#### Knowledge Workers
+
+Both models are capable for writing, summarisation, and note processing. Qwen3 4B's speed advantage makes it a better fit for workflows where you are processing many prompts throughout a working day.
+
+For single high-stakes tasks — generating a detailed document, processing a complex set of notes — Gemma's more thorough output may be preferable.
+
+#### Privacy-Focused Users
+
+Both models run entirely on-device with no internet connection required during use. From a privacy perspective, either model is equally appropriate. The choice reduces to the same practical considerations of speed, size, and output style.
+
+#### Phoenix Users
+
+Both Gemma 4 E4B and Qwen3 4B worked successfully with Phoenix through LM Studio's OpenAI-compatible API. The integration — described in Chapter 4 — requires only a base URL (`http://localhost:1234/v1`) and a model identifier.
+
+In practice, Qwen3 4B felt more responsive during Phoenix interactions. With generation running at 46–50 tok/s, BISHOP note processing and HERMES chat responses returned noticeably faster than with Gemma 4 E4B at 32–34 tok/s.
+
+Gemma 4 E4B, given its tendency toward more thorough output, is likely to produce somewhat more detailed BISHOP summaries and entity extraction. For workflows where BISHOP output quality matters more than turnaround speed — processing a large backlog of captures, for example — Gemma may be the better fit.
+
+Either model is a viable choice for Phoenix. The decision comes down to whether speed or thoroughness is the higher priority for your specific workflow.
+
+---
+
+### Quick Decision Matrix
+
+Both Gemma 4 E4B and Qwen3 4B passed every Benchmark v1 category on a MacBook Air M5 (16 GB). Neither model failed on any of the three benchmark prompts. From a raw capability standpoint, both are appropriate starting points.
+
+The decision between them is practical, not qualitative. The table below summarises the key trade-offs.
+
+| If you want... | Choose... |
+|---|---|
+| Fastest responses | Qwen3 4B |
+| Smallest model | Qwen3 4B |
+| Best coding completeness | Gemma 4 E4B |
+| More test cases and documentation | Gemma 4 E4B |
+| Lowest storage usage | Qwen3 4B |
+| Simplest setup (no configuration) | Gemma 4 E4B |
+| First local model to download | Qwen3 4B |
+
+If none of those criteria apply clearly to your situation, start with Qwen3 4B. It is smaller, faster, and leaves room to add Gemma 4 E4B later once you have more experience with what local AI can do.
+
+---
+
+### Future Benchmarks
+
+The benchmark programme for this guide is ongoing.
+
+Both models evaluated in this chapter represent a starting point, not a complete picture. Additional evaluations are planned for:
+
+* DeepSeek — particularly the DeepSeek-R1 series, noted for reasoning capabilities
+* Mistral — compact models with broad general-purpose performance
+* Llama — Meta's widely-used open-weight family
+* Additional Gemma variants — including larger parameter counts where hardware allows
+* Larger Qwen models — if RAM headroom permits on the reference hardware
+
+No performance claims are made for any of these models until benchmarks are completed on the same reference hardware and using the same methodology documented in Chapter 6.
+
+Future editions of this guide may incorporate new benchmark results as additional models are tested. The research repository is updated as each session is completed.
+
+---
+
+### Key Takeaway
+
+Both Gemma 4 E4B and Qwen3 4B passed every benchmark category in this guide. Both run well on a MacBook Air M5 with 16 GB of unified memory. Both are capable starting points for local AI on Apple Silicon.
+
+The difference between them is not capability — it is character.
+
+Gemma is thorough. Qwen is fast and compact.
+
+For most beginners, Qwen3 4B is the better starting point. For developers who value complete output over speed, Gemma 4 E4B is worth the additional storage and slightly slower generation.
+
+The most important takeaway is this: test both on the tasks you actually care about. Benchmark results tell you what is possible. Your own workflows tell you what is useful.
+
+The next chapter documents the benchmarking methodology in detail — the exact prompts used, the scoring criteria applied, and the evidence collection process — so that you can reproduce these results and run your own evaluations on any model.
