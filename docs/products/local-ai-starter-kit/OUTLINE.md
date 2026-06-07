@@ -23,7 +23,6 @@ By the end of this guide you will be able to:
 
 * Understand the strengths and limitations of local AI
 * Install and use LM Studio
-* Install and use Ollama
 * Select appropriate models for your hardware
 * Benchmark local models consistently
 * Troubleshoot common issues
@@ -63,7 +62,7 @@ Deliverable:
 
 ---
 
-## Chapter 3 — Getting Started with LM Studio
+## Chapter 3 — Running Your First Local Model with LM Studio
 
 Topics:
 
@@ -80,21 +79,21 @@ Deliverable:
 
 ---
 
-## Chapter 4 — Getting Started with Ollama
-
-Status: Planned
+## Chapter 4 — From Chat to Applications
 
 Topics:
 
-* Installing Ollama
-* Pulling models
-* Running models from terminal
-* Basic API usage
-* Ollama versus LM Studio
+* The limitation of chat interfaces
+* Local AI as infrastructure
+* Understanding local AI architecture
+* Phoenix case study
+* Switching AI providers
+* When local AI wins
+* Key takeaway
 
 Deliverable:
 
-* Fully functioning local AI setup using Ollama
+* Working understanding of how to integrate local AI into a real application
 
 ---
 
@@ -249,3 +248,21 @@ Future versions:
 * DeepSeek benchmarks
 * Additional model comparisons
 * Workshop companion materials
+
+---
+
+## Appendix A — Running Models with Ollama
+
+Status: Planned
+
+Topics:
+
+* Installing Ollama
+* Pulling models
+* Running models from terminal
+* Basic API usage
+* Ollama versus LM Studio
+
+Deliverable:
+
+* Fully functioning local AI setup using Ollama

@@ -6,7 +6,7 @@ This product is being developed as part of the StackPilot Labs Local AI Benchmar
 
 ## Product Status
 
-Current Version: Draft v0.1
+Current Version: Draft v0.2
 
 Progress:
 - ✅ Product structure created
@@ -14,7 +14,11 @@ Progress:
 - ✅ Gemma 4 E4B benchmark completed
 - ✅ Qwen3 4B benchmark completed
 - ✅ Comparison infographic completed
-- ⬜ Chapter writing in progress
+- ✅ Chapter 1 — Introduction to Local AI
+- ✅ Chapter 2 — Hardware Requirements
+- ✅ Chapter 3 — Running Your First Local Model with LM Studio
+- ✅ Chapter 4 — From Chat to Applications
+- ⬜ Chapters 5–10 pending
 - ⬜ Prompt pack creation pending
 - ⬜ Gumroad packaging pending
 - ⬜ First release pending
