@@ -1002,3 +1002,383 @@ For most beginners, Qwen3 4B is the better starting point. For developers who va
 The most important takeaway is this: test both on the tasks you actually care about. Benchmark results tell you what is possible. Your own workflows tell you what is useful.
 
 The next chapter documents the benchmarking methodology in detail — the exact prompts used, the scoring criteria applied, and the evidence collection process — so that you can reproduce these results and run your own evaluations on any model.
+
+
+## Chapter 6 — Benchmarking Methodology
+
+### Why Benchmark Local Models
+
+When evaluating local AI models, subjective impressions are unreliable.
+
+A model that impresses on the first prompt might fail completely on the second. Output that looks correct at a glance might contain subtle logic errors. Generation speed that feels fast during a casual conversation might feel sluggish during a focused working session.
+
+The same problem affects model comparisons. Without a consistent test, comparing two models reduces to comparing two different experiences — different prompts, different sessions, different expectations.
+
+Benchmarking solves this by establishing fixed conditions. The same prompt, applied to multiple models, under the same hardware and software settings, produces results that can be compared meaningfully.
+
+This does not make benchmarking a perfect signal. A model might pass a benchmark prompt and still fail on tasks that matter to you. A model might fail a benchmark and still be excellent for your specific use case. Benchmarks reveal certain capabilities under certain conditions — they do not reveal everything.
+
+What benchmarks do provide is a reproducible baseline. A result you can point to, verify, and replicate. That is more valuable than a strong impression.
+
+#### Why StackPilot Labs Created Benchmark v1
+
+The benchmark prompts used in this guide were created for a specific purpose: to evaluate small local models on tasks that reflect actual use rather than academic performance metrics.
+
+The models being evaluated — Gemma 4 E4B, Qwen3 4B, and future candidates — are designed for practical, everyday use on consumer hardware. Evaluating them on academic reasoning datasets or large-scale programming challenges would not reflect how they perform during a real working session.
+
+Benchmark v1 focuses on three practical categories: coding, refactoring, and reasoning. These were selected because they represent the tasks most commonly attempted with local AI by the target audience of this guide — developers, students, and knowledge workers using AI as part of a daily workflow.
+
+The prompts were defined on 2026-05-31 and applied consistently to every model tested since that date.
+
+---
+
+### Designing Benchmark v1
+
+Three benchmark categories were defined, each targeting a distinct capability.
+
+#### Coding
+
+Writing code from a specification is the most common practical task for local AI among technical users.
+
+The Coding Benchmark v1 prompt asks the model to implement a specific Python function — `flatten_dict` — that handles a moderately complex problem: recursively flattening a nested dictionary with dot-separated keys. The function must handle arbitrarily deep nesting, handle the edge case of empty dictionaries, include a docstring, and include at least two assert-based test cases.
+
+This task was selected because it tests multiple capabilities simultaneously:
+
+* Algorithm design — recursive traversal of arbitrary depth
+* Code correctness — output must match the specification
+* Code quality — docstring, type hints, style
+* Test writing — assert statements that cover real requirements
+* Edge case handling — empty dictionary input
+
+A model that produces a working function without tests or documentation scores differently from one that addresses all requirements. This makes the benchmark sensitive to output thoroughness as well as correctness.
+
+#### Refactoring
+
+Refactoring is a distinct skill from writing new code. A model must understand existing code, identify its problems, and improve it without changing what it does.
+
+The Refactoring Benchmark v1 prompt provides a functional but poorly written Python function and asks the model to improve it. The required improvements are: adding type hints, reducing duplication, using a more Pythonic loop style, and preserving the original behavior.
+
+This task tests:
+
+* Understanding of existing code intent
+* Knowledge of Python idioms — list comprehensions, direct iteration, `abs()`
+* Ability to preserve behavior while changing implementation
+* Code style judgment
+
+#### Reasoning
+
+Natural language reasoning reveals whether a model can parse ambiguous language and apply basic logic rather than defaulting to pattern-matching on surface structure.
+
+The Reasoning Benchmark v1 prompt is a classic misdirection problem. The phrasing "all but 9" is designed to catch models that pattern-match on the numbers 17 and 9 and return a subtraction result. The correct answer requires reading the language accurately rather than performing arithmetic.
+
+This prompt was selected because:
+
+* It is short and has one unambiguous correct answer
+* It has a well-known common failure mode (returning 8 instead of 9)
+* It evaluates language comprehension, not domain knowledge
+* The requirement to show reasoning steps makes the model's approach visible
+
+---
+
+### Coding Benchmark v1
+
+**Purpose:** Evaluate a model's ability to write a correct, well-structured Python function from a written specification.
+
+**Prompt (exact):**
+
+```
+Write a Python function called `flatten_dict` that takes a nested dictionary and returns a flat dictionary with dot-separated keys.
+
+Example:
+Input:  {"a": {"b": {"c": 1}, "d": 2}, "e": 3}
+Output: {"a.b.c": 1, "a.d": 2, "e": 3}
+
+Requirements:
+- Handle arbitrarily deep nesting
+- Handle empty dicts
+- Include a docstring
+- Include at least two test cases using assert statements at the bottom of the file
+```
+
+**What the benchmark evaluates:**
+
+* Does the function produce syntactically correct Python?
+* Does it correctly handle arbitrarily deep nested input?
+* Does it handle the empty dictionary edge case?
+* Are the assert statements correct and meaningful?
+* Does the output include a docstring?
+
+**Pass criteria:** The function must handle both the standard nested case and the empty dictionary edge case, produce syntactically valid Python, and include at least two meaningful assert statements.
+
+**Common failure modes:**
+
+* Producing code that handles simple nesting but not arbitrary depth — missing recursion
+* Omitting the empty dictionary edge case
+* Including assert statements that do not actually test the function's behaviour
+* Producing syntactically invalid code that does not run
+
+---
+
+### Refactoring Benchmark v1
+
+**Purpose:** Evaluate a model's ability to improve existing code while preserving its external behaviour.
+
+**Prompt (exact):**
+
+```
+Refactor the following Python code. Improve readability, remove duplication, and add type hints. Do not change the function's external behaviour.
+
+    def process(data):
+        result = []
+        for i in range(len(data)):
+            if data[i] > 0:
+                result.append(data[i] * 2)
+            elif data[i] < 0:
+                result.append(data[i] * -1)
+            else:
+                result.append(0)
+        return result
+```
+
+**What the benchmark evaluates:**
+
+* Does the refactored function add correct type hints?
+* Does it replace the index-based loop with a more Pythonic approach?
+* Does the refactored code produce identical output to the original for all inputs?
+* Is readability genuinely improved?
+
+**Pass criteria:** The refactored function must preserve the original behaviour, add type hints, and demonstrate at least one meaningful improvement to code style — such as replacing `range(len(data))` with direct iteration, simplifying the conditionals, or using `abs()`.
+
+**Common failure modes:**
+
+* Adding type hints that are incorrect — wrong parameter or return types
+* Changing the function's behaviour while simplifying the logic — particularly for zero values
+* Making cosmetic changes only — renaming variables without improving structure
+* Removing the branch for zero values, which changes the output
+
+---
+
+### Reasoning Benchmark v1
+
+**Purpose:** Evaluate a model's ability to parse ambiguous natural language and apply logic rather than performing surface-level arithmetic.
+
+**Prompt (exact):**
+
+```
+A farmer has 17 sheep. All but 9 die. How many sheep does the farmer have left?
+
+Show your reasoning step by step before giving the final answer.
+```
+
+**Why this prompt works:**
+
+The phrase "all but 9" is the key. Interpreted correctly, it means "all except 9 die" — leaving 9 surviving sheep. A model that reads this accurately arrives at 9.
+
+The common failure mode is arithmetic: a model sees the numbers 17 and 9, performs 17 − 9 = 8, and returns 8. This is the wrong answer, but it looks plausible without careful reading of the language. It is a meaningful failure signal — the model can do arithmetic but cannot parse the sentence it was given.
+
+The instruction to "show reasoning step by step" makes the model's approach visible. A model that arrives at the wrong answer but shows its reasoning reveals exactly where the logic failed. A model that arrives at the right answer without showing reasoning gives less signal about whether it understood the problem.
+
+> Correct answer: 9. A confident answer of 8 indicates the model calculated rather than read.
+
+**Pass criteria:** The model must return 9 as the final answer and demonstrate in its reasoning that it correctly interpreted "all but 9" as "all except 9 survive."
+
+**Common failure modes:**
+
+* Returning 8 — subtraction without reading the language
+* Returning 9 without meaningful reasoning — correct answer but no visible process
+* Expressing uncertainty and refusing to commit to a final answer
+
+---
+
+### Benchmark Environment
+
+All benchmark results in this guide were collected under consistent conditions on a single machine. Results are not interpolated or extrapolated from other hardware.
+
+**Hardware:**
+
+| Component | Details |
+|---|---|
+| Machine | MacBook Air M5 |
+| Memory | 16 GB unified RAM |
+| Storage | 1 TB SSD |
+| Operating system | macOS Tahoe |
+| Runtime | LM Studio |
+
+**LM Studio settings for all benchmark runs:**
+
+| Setting | Value |
+|---|---|
+| GPU Layers | Max — all layers offloaded to Metal |
+| Context length | 4096 tokens |
+| Flash Attention | Enabled where available |
+| Temperature | 0.7 |
+| Repeat Penalty | 1.1 |
+| System prompt | None |
+
+**Model formats tested:**
+
+| Model | Format | LM Studio ID |
+|---|---|---|
+| Gemma 4 E4B | GGUF Q4_K_M | `google/gemma-4-e4b` |
+| Qwen3 4B | MLX 4-bit | `qwen/qwen3-4b` |
+
+**Test conditions applied during every session:**
+
+* Only Activity Monitor and LM Studio open — all other applications closed
+* WiFi disabled during benchmark runs to prevent background network traffic
+* Machine plugged into mains power — not running on battery
+* Fresh chat session started for each benchmark prompt — no context carry-over between prompts
+* Each prompt pasted exactly as written in `examples/benchmark-prompts.md`
+
+---
+
+### Evidence Collection Process
+
+Each benchmark session produces several categories of evidence, all recorded in the repository.
+
+**Screenshots**
+
+The primary evidence for each benchmark is a screenshot of the LM Studio chat panel showing the full model response. For longer outputs, two screenshots are taken to capture the complete response without truncation.
+
+Screenshots are stored in `assets/screenshots/` using a consistent naming pattern:
+
+```
+{model}-{benchmark}-benchmark-v1-{part}.png
+```
+
+Examples from the sessions completed for this guide:
+
+* `gemma4-coding-benchmark-v1-1.png`
+* `gemma4-coding-benchmark-v1-2.png`
+* `qwen3-reasoning-benchmark-v1.png`
+
+**Token Speed Measurements**
+
+Generation speed is read from LM Studio's stats bar, which displays tokens per second during and immediately after a response. The value is noted directly from the interface — no external measurement tools are used.
+
+Speed is recorded as a single observation per run, not averaged across multiple runs. Where the stats bar shows decimal precision, that value is recorded directly.
+
+| Model | Coding | Refactoring | Reasoning |
+|---|---|---|---|
+| Gemma 4 E4B | ~33 tok/s | ~32 tok/s | ~32 tok/s |
+| Qwen3 4B | 46.84 tok/s | 46.02 tok/s | 49.53 tok/s |
+
+**Experiment Log**
+
+Every test session is recorded as a dated entry in `EXPERIMENT-LOG.md`. Each entry includes measurements taken, qualitative observations, evidence file references, and next planned steps.
+
+The log is append-only — past entries are never edited. This makes it a reliable record of what was actually observed during each session, including failed attempts, unexpected behaviour, and configuration changes required mid-session.
+
+**Benchmark Results Document**
+
+Qualitative results — Pass / Partial / Fail — are recorded in `docs/10-benchmarks.md` alongside per-run measurements. Each entry uses a consistent template to ensure results from different sessions are directly comparable.
+
+---
+
+### Lessons Learned During Testing
+
+These observations emerged directly from the benchmark sessions documented in the experiment log. They are recorded as practical guidance for anyone conducting their own evaluations.
+
+**Think mode must be managed explicitly for Qwen3 4B**
+
+During the initial Coding Benchmark v1 run with Qwen3 4B, Think mode was enabled. The model began generating extensively without producing a final answer. The session was terminated, the model was ejected and reloaded in LM Studio, and Think mode was disabled before running the benchmark again.
+
+This is the most significant configuration note for Qwen3 4B on this hardware. Think mode is not universally harmful — it is designed to improve reasoning on complex multi-step problems. But on a MacBook Air M5 (16 GB) with this model, it can cause generation to stall on structured tasks. Disable it before running any benchmark prompt.
+
+**GGUF and MLX are not directly comparable formats**
+
+Gemma 4 E4B runs as GGUF Q4_K_M. Qwen3 4B runs as MLX 4-bit. These are different model formats using different inference paths on Apple Silicon.
+
+The speed difference observed — approximately 39% — reflects both the model design and the format. MLX is optimised for Apple Silicon's unified memory architecture in a way that standard GGUF inference is not. It is not possible to cleanly isolate how much of the speed difference is attributable to the model versus the runtime.
+
+This is not a flaw in the methodology — it is a real-world constraint. When selecting models for local AI use, the format and runtime are part of the decision. Benchmark results should be interpreted with this in mind.
+
+**Output style differs predictably between models**
+
+Both models produced correct, working solutions to all three benchmark prompts. The style of those solutions differed in ways that are consistent and predictable.
+
+Gemma 4 E4B produced more thorough output on the Coding Benchmark: detailed docstrings, explicit type hints, and 4 assert cases. Qwen3 4B produced correct, concise output: a working implementation, a docstring, and 3 assert cases.
+
+Neither is objectively superior. The preference depends on whether the user values completeness or conciseness. What the benchmark establishes is that this difference is repeatable — not random.
+
+**Speed variation across categories reflects response length**
+
+Qwen3 4B showed higher throughput on the Reasoning benchmark (49.53 tok/s) compared to Coding (46.84 tok/s) and Refactoring (46.02 tok/s). This is consistent with response length — reasoning responses are typically shorter than full function implementations, and shorter responses tend to produce slightly different throughput readings.
+
+Gemma 4 E4B showed less variation (~33, ~32, ~32 tok/s), reflecting its more uniform output length across the three benchmark types.
+
+---
+
+### Running Your Own Benchmark v1
+
+The prompts used in this guide are available in `examples/benchmark-prompts.md` in the research repository. Anyone can run the same evaluation on any model.
+
+**Step 1 — Set up the test environment**
+
+Configure LM Studio with the benchmark settings before loading the model:
+
+| Setting | Value |
+|---|---|
+| Context length | 4096 |
+| Temperature | 0.7 |
+| System prompt | None |
+| Think mode | Disabled |
+
+Close all other applications. Disable WiFi. Plug in your machine.
+
+**Step 2 — Start a fresh chat session for each prompt**
+
+Each benchmark prompt must run in its own chat session. Do not carry context from one benchmark into the next. Context from previous messages can influence model responses in ways that are difficult to detect.
+
+**Step 3 — Paste the prompt exactly**
+
+Copy the prompt from `examples/benchmark-prompts.md` exactly as written and paste it into a new chat session. Do not add instructions, modify wording, or split the prompt across multiple messages. Even small changes to prompt phrasing can meaningfully affect model output.
+
+**Step 4 — Record what you observe**
+
+For each run, note:
+
+* The tokens per second reading from LM Studio's stats bar
+* Whether the output meets the pass criteria
+* Any notable observations about output style or unexpected behaviour
+* Any configuration adjustments made mid-session
+
+Take a screenshot of the complete model response before closing the session.
+
+**Step 5 — Apply pass criteria consistently**
+
+Use the same evaluation criteria for every model:
+
+| Benchmark | Pass requires |
+|---|---|
+| Coding v1 | Correct recursive implementation, handles empty dict, docstring present, at least 2 valid assert cases |
+| Refactoring v1 | Type hints added, loop style improved, original behaviour preserved |
+| Reasoning v1 | Final answer is 9, reasoning demonstrates correct interpretation of "all but 9" |
+
+If you are unsure whether a result is Pass or Partial, record it as Partial and note what was missing. Partial results are more informative than a forced binary judgement.
+
+**Common testing mistakes to avoid:**
+
+* Comparing models across different temperatures or context lengths — settings must be identical
+* Running prompts in sessions with context remaining from prior messages
+* Using paraphrased versions of the prompts — wording changes affect model output
+* Recording only the final verdict without capturing the full response
+* Leaving Think mode enabled on Qwen models without first verifying it completes responses
+
+---
+
+### Key Takeaway
+
+Benchmarking is not about declaring winners.
+
+A model that passes all three Benchmark v1 categories is not proven to be generally excellent. A model that fails one category is not proven to be generally poor. The benchmark reveals specific capabilities under specific conditions on specific hardware.
+
+What matters more than any individual result is the methodology behind it.
+
+A reproducible benchmark — same prompt, same settings, same hardware, same evaluation criteria — produces results that can be compared, challenged, and built upon. An impression cannot be replicated. A benchmark can.
+
+Benchmark v1 is a starting point, not a ceiling. As more models are tested, as new task categories are identified, and as hardware evolves, the methodology will grow. The experiment log and benchmark documents in this repository will be updated as each new session is completed.
+
+The foundation for meaningful comparison is already in place.
+
+The next chapter presents the full benchmark results for Gemma 4 E4B and Qwen3 4B — detailed output observations, screenshot evidence, and the head-to-head analysis that emerges from applying this methodology consistently across both models.
