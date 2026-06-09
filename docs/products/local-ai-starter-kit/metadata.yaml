@@ -1,0 +1,47 @@
+---
+title: "Local AI Starter Kit for Mac"
+subtitle: "A Practical Guide to Running, Benchmarking, and Choosing Local AI Models on Apple Silicon"
+author: "StackPilot Labs"
+version: "1.0"
+date: "June 2026"
+lang: "en"
+
+# PDF layout settings (used by Pandoc with XeLaTeX)
+documentclass: report
+papersize: a4
+fontsize: 11pt
+linestretch: 1.4
+margin-left: 2.5cm
+margin-right: 2.5cm
+margin-top: 3cm
+margin-bottom: 3cm
+
+# Fonts (XeLaTeX / LuaLaTeX)
+mainfont: "Charter"
+sansfont: "Helvetica Neue"
+monofont: "Menlo"
+monofontoptions:
+  - Scale=0.85
+
+# Table of contents
+toc: true
+toc-depth: 2
+toc-title: "Contents"
+number-sections: true
+
+# Title page — suppress Pandoc's auto-generated title block
+# The guide's own title page is embedded in BOOK.md
+title-page: false
+
+# Hyperlinks in PDF
+colorlinks: true
+linkcolor: "black"
+urlcolor: "black"
+citecolor: "black"
+
+# Code blocks
+highlight-style: monochrome
+
+# Header/footer via geometry (configured in build command)
+pagestyle: plain
+---
