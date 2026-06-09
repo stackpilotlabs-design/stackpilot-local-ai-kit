@@ -24,7 +24,7 @@ Several factors are driving interest in local AI.
 
 #### Privacy
 
-With local AI, prompts remain on your machine.
+With local AI, prompts remain on your machine when the model is already downloaded, the local runtime is selected, and no cloud provider or remote tool is enabled.
 
 You do not need to send personal notes, code, research material, or proprietary information to a third-party service.
 
@@ -81,6 +81,8 @@ Local AI is particularly useful for:
 * Local coding assistance
 * Research workflows
 * Offline usage scenarios
+
+Initial setup still requires internet access to download LM Studio and model files. Offline use applies after installation and download, when a local provider is selected.
 
 Many users discover that local models are more capable than expected for day-to-day tasks.
 
@@ -147,7 +149,7 @@ For Apple Silicon systems, unified memory is shared across the CPU, GPU, and AI 
 
 #### Storage
 
-Models occupy disk space.
+Models occupy disk space. Disk size is also a useful rough proxy for memory needs, but not a guarantee.
 
 For example, during the benchmark research for this guide:
 
@@ -300,6 +302,8 @@ LM Studio includes a built-in model browser connected to the Hugging Face model 
 
 For this guide, two models are recommended as starting points.
 
+These instructions reflect the tested environment. LM Studio's interface may use labels such as Discover, Search, Developer, Local Server, or Server depending on version; use the equivalent model search and server controls if your UI differs.
+
 #### Gemma 4 E4B
 
 Gemma 4 E4B is a compact, capable model from Google DeepMind.
@@ -333,6 +337,8 @@ The MLX variant is recommended here because it is optimised for Apple Silicon an
 
 If storage is limited, start with Qwen3 4B. If you have the space, downloading both allows for direct comparison — which is covered in Chapter 7.
 
+After downloading, copy the exact model identifier shown by LM Studio. The identifiers used in this guide are the ones from the tested environment.
+
 ---
 
 ### Loading a Model
@@ -361,7 +367,7 @@ A few things worth observing during your first session:
 
 * Generation speed is visible in real time — note the tokens per second figure and compare it across models
 * Longer and more complex prompts will take more time to process
-* Responses are generated entirely on your Mac with no outbound network traffic
+* Responses are generated on your Mac when the local model is selected; avoid cloud providers or remote tools if you want the session to remain local
 
 If the response feels slow on the first prompt, this is normal. The model performs best after an initial warm-up period. Subsequent prompts in the same session will generally feel faster.
 
@@ -395,18 +401,18 @@ Any application running on the same machine can now send requests to this addres
 
 LM Studio's local server implements the OpenAI Chat Completions API format.
 
-In practice, this means any application that already supports OpenAI as a provider can be redirected to LM Studio with minimal configuration changes. Instead of sending requests to OpenAI's servers, the application sends them to `http://localhost:1234/v1`, and LM Studio handles the response using whichever model is currently loaded.
+In practice, this means many applications that support basic OpenAI chat-completion requests can be redirected to LM Studio with minimal configuration changes. Instead of sending requests to OpenAI's servers, the application sends them to `http://localhost:1234/v1`, and LM Studio handles the response using whichever model is currently loaded.
 
-The model identifier follows the format `provider/model-name`.
+The model identifier usually follows the format `provider/model-name`.
 
-For the models used in this guide:
+For the models used in the tested environment:
 
 | Model       | Identifier            |
 |-------------|-----------------------|
 | Gemma 4 E4B | `google/gemma-4-e4b`  |
 | Qwen3 4B    | `qwen/qwen3-4b`       |
 
-No API key is required when running locally. Some applications require an API key field to be filled regardless. Entering any placeholder value such as `local` or `lmstudio` is sufficient — the value is not validated when connecting to a local server.
+For the default localhost-only server, no API key is required. Some applications require an API key field to be filled regardless; a placeholder such as `local` or `lmstudio` is usually sufficient. If you enable LM Studio server authentication or expose the server beyond localhost, use the token shown by LM Studio.
 
 ---
 
@@ -414,7 +420,7 @@ No API key is required when running locally. Some applications require an API ke
 
 The OpenAI-compatible API becomes immediately useful when connecting it to real applications.
 
-Phoenix is a personal knowledge management application used throughout this guide as a worked example of local AI in practice. Connecting it to LM Studio requires only a base URL (`http://localhost:1234/v1`) and a model identifier — no code changes, no infrastructure setup. Redirecting those two values is sufficient.
+Phoenix is a personal knowledge management application used throughout this guide as a worked example of local AI in practice. For this integration, connecting it to LM Studio requires only a base URL (`http://localhost:1234/v1`) and a model identifier — no code changes, no infrastructure setup. Redirecting those two values is sufficient.
 
 Chapter 4 examines this integration in full: what Phoenix does, how it uses the local model for real tasks, and what the architecture looks like in practice.
 
@@ -501,15 +507,15 @@ POST http://localhost:1234/v1/chat/completions
 }
 ```
 
-LM Studio receives this request, passes it to the loaded model, and returns a response in the same format that OpenAI uses.
+LM Studio receives this request, passes it to the loaded model, and returns a response in the same general format that OpenAI uses for chat completions.
 
-The application does not need to know what model is running. It does not need to know it is talking to LM Studio rather than a cloud service. It sends a request and receives a response.
+The application does not need to know the model internals, but it does need to send a model identifier that LM Studio accepts. For basic chat-completion requests, it sends a request and receives a response.
 
-This compatibility is why switching an application from cloud AI to local AI can be as simple as changing a base URL and a model identifier.
+This compatibility is why switching an application from cloud AI to local AI can often be as simple as changing a base URL and a model identifier.
 
 From `https://api.openai.com/v1` to `http://localhost:1234/v1`.
 
-The application code does not change. The data stays on the machine.
+For basic chat-completion workflows, the application code may not need to change. The data stays on the machine when the request is sent to the local server and no remote provider or tool is used.
 
 ---
 
@@ -522,9 +528,9 @@ Phoenix is a personal knowledge management application built to run locally on a
 
 The motivation behind it is practical. Most productivity tools store data in the cloud, process notes on remote servers, and route everything through third-party services. For someone working with sensitive personal material — private notes, research, work observations — this creates a structural problem. The tool cannot be fully trusted with the content.
 
-Phoenix is built with a different assumption. The application runs locally. The database is a local SQLite file. AI processing happens on the same machine, using whatever model is loaded in LM Studio.
+Phoenix is built with a different assumption. The application runs locally. The database is a local SQLite file. AI processing happens on the same machine when LM Studio is selected as the provider.
 
-Nothing leaves the machine unless the user explicitly chooses a cloud provider.
+Nothing leaves the machine unless the user explicitly chooses a cloud provider or remote tool.
 
 #### What Phoenix Does
 
@@ -567,7 +573,7 @@ HERMES is a hybrid system. Most intents are handled without involving the AI at 
 
 The place where AI noticeably improves the experience is search synthesis. When a user asks a natural language question, HERMES retrieves the top matching notes using full-text search and then passes them to the model, which produces a grounded answer based only on the retrieved content.
 
-The model does not generate answers from its training data. It synthesises from notes the user actually wrote. This distinction matters for personal knowledge management — the AI is working as an organiser and retriever, not as a source.
+HERMES is designed to ground answers in notes the user actually wrote rather than asking the model to answer from general knowledge. The generated synthesis can still be wrong, so retrieved context should be reviewed.
 
 ---
 
@@ -593,7 +599,7 @@ The practical difference between local and cloud providers in this setup:
 
 | Aspect | Local (LM Studio, Ollama) | Cloud (Anthropic, OpenRouter) |
 |---|---|---|
-| API key required | No | Yes |
+| API key required | No by default | Yes |
 | Data leaves machine | No | Yes |
 | Request timeout | 120 seconds | 60 seconds |
 | Cost | None | Per-token or subscription |
@@ -614,7 +620,7 @@ Not every task benefits equally from local AI. There are specific categories whe
 
 Personal notes, private reflections, financial observations, and career documentation are examples of content that many people are reluctant to send to a third-party service.
 
-With local AI, this content never leaves the machine. There is no data retention policy to review, no terms of service to evaluate, no account to trust. The model processes the content locally and returns a result.
+With local AI, this content stays on the machine when a local provider is selected and no remote tools are enabled. The model processes the content locally and returns a result.
 
 For users whose primary concern is privacy, this is not a feature. It is a prerequisite.
 
@@ -626,7 +632,7 @@ Running AI over this content locally means the model is working with your actual
 
 #### Offline and Reliable Workflows
 
-Cloud AI depends on network connectivity. Local AI does not.
+Cloud AI depends on network connectivity. Local AI does not once models are downloaded and local providers are selected.
 
 For workflows that need to function consistently — during travel, in restricted network environments, or when a cloud service has an outage — local AI provides reliability that cloud services cannot guarantee.
 
@@ -634,7 +640,7 @@ For workflows that need to function consistently — during travel, in restricte
 
 Running model comparisons, testing prompts, and iterating on processing workflows is expensive when every request is a billable API call.
 
-Local models make experimentation free. You can run the same prompt against two models fifty times, compare outputs in detail, and refine without any financial consideration. The feedback loop is faster and the exploration is less constrained.
+Local models remove per-token API cost. You can run the same prompt against two models fifty times, compare outputs in detail, and refine without the cost concern of a cloud API. The feedback loop is faster and the exploration is less constrained.
 
 ---
 
@@ -660,7 +666,7 @@ Model
 Result — on your machine, under your control
 ```
 
-Any application that makes HTTP requests can be connected to a local AI runtime. Any workflow that currently depends on a cloud AI service can, in principle, be rebuilt with a local model and a local server. The switching cost is a base URL and a model identifier.
+Any application that can send the expected OpenAI-compatible request format can be connected to a local AI runtime. Any workflow that currently depends on basic cloud AI chat-completion requests can, in principle, be rebuilt with a local model and a local server. The switching cost is often a base URL and a model identifier.
 
 Model selection and detailed benchmark analysis are covered in depth in Chapters 5, 6, and 7. Chapter 5 compares Gemma 4 E4B and Qwen3 4B directly. Chapter 6 documents the benchmarking methodology used to evaluate them. Chapter 7 presents the results with full evidence.
 
@@ -733,7 +739,7 @@ Of these families, Gemma and Qwen have been benchmarked on the reference hardwar
 
 #### Overview
 
-Gemma 4 E4B is a 4-billion-parameter model from Google DeepMind, benchmarked in Q4_K_M quantization format via LM Studio on the MacBook Air M5 (16 GB).
+Gemma 4 E4B is an E4B-class model from Google DeepMind, benchmarked in Q4_K_M quantization format via LM Studio on the MacBook Air M5 (16 GB).
 
 | Metric | Value |
 |---|---|
@@ -767,7 +773,7 @@ Gemma 4 E4B is a 4-billion-parameter model from Google DeepMind, benchmarked in 
 | Coding v1 | PASS | Type hints, docstring, 4 asserts, handles edge cases |
 | Refactoring v1 | PASS | Full checklist addressed, list comprehension, verification |
 | Reasoning v1 | PASS | Correct answer (9), step-by-step, avoided common trap |
-| Speed | 32–34 tok/s | Consistent across all three benchmark runs |
+| Speed | 32–34 tok/s | Observed across all three recorded benchmark runs |
 
 #### Ideal Use Cases
 
@@ -784,7 +790,7 @@ The next model benchmarked on the same hardware takes a different approach — o
 
 #### Overview
 
-Qwen3 4B is a 4-billion-parameter model from Alibaba's Qwen team, benchmarked in MLX 4-bit format via LM Studio on the MacBook Air M5 (16 GB).
+Qwen3 4B is a 4B-class model from Alibaba's Qwen team, benchmarked in MLX 4-bit format via LM Studio on the MacBook Air M5 (16 GB).
 
 | Metric | Value |
 |---|---|
@@ -795,7 +801,7 @@ Qwen3 4B is a 4-billion-parameter model from Alibaba's Qwen team, benchmarked in
 
 #### Strengths
 
-**Significantly faster.** Qwen3 4B generated at 46–50 tok/s across all three benchmark runs — approximately 39% faster than Gemma 4 E4B on identical prompts and hardware. At this speed, responses feel noticeably more interactive.
+**Significantly faster.** Qwen3 4B generated at 46–50 tok/s across all three recorded benchmark runs — approximately 39% faster than Gemma 4 E4B on identical prompts and hardware. At this speed, responses feel noticeably more interactive.
 
 **Compact footprint.** At 2.28 GB, Qwen3 4B is less than half the size of Gemma 4 E4B. It loads faster, takes up less storage, and leaves more headroom for other applications to run concurrently.
 
@@ -817,7 +823,7 @@ Qwen3's Think mode is designed to improve reasoning on complex problems by runni
 
 In practice, on a MacBook Air M5 (16 GB), Think mode enabled can cause the model to generate extensively without reaching a conclusion — particularly on longer or more structured prompts.
 
-For everyday tasks — coding, refactoring, summarisation, chat — disable Think mode in LM Studio before running prompts. The setting is visible in the model parameters panel in LM Studio's chat interface.
+For everyday tasks — coding, refactoring, summarisation, chat — disable Think mode before running prompts. Depending on the LM Studio version and Qwen build, this may appear as Think mode, Enable Thinking, or be controlled with `/no_think`; use one method consistently during benchmarks.
 
 #### Benchmark Results
 
@@ -911,7 +917,7 @@ For single high-stakes tasks — generating a detailed document, processing a co
 
 #### Privacy-Focused Users
 
-Both models run entirely on-device with no internet connection required during use. From a privacy perspective, either model is equally appropriate. The choice reduces to the same practical considerations of speed, size, and output style.
+Both models run on-device after download when used through a local provider. From a privacy perspective, either model is equally appropriate under that local-only setup. The choice reduces to the same practical considerations of speed, size, and output style.
 
 #### Phoenix Users
 
@@ -1255,7 +1261,7 @@ These observations emerged directly from the benchmark sessions documented in th
 
 **Think mode must be managed explicitly for Qwen3 4B**
 
-This is the most significant configuration note for Qwen3 4B on this hardware: disable Think mode before running any benchmark prompt. The behaviour, its cause, and full practical guidance are documented in Chapter 5 — Think Mode — Practical Guidance.
+This is the most significant configuration note for Qwen3 4B on this hardware: disable Think mode before running any benchmark prompt, using the available model setting or `/no_think` where supported. The behaviour, its cause, and full practical guidance are documented in Chapter 5 — Think Mode — Practical Guidance.
 
 **GGUF and MLX are not directly comparable formats**
 
@@ -1269,13 +1275,13 @@ This is not a flaw in the methodology — it is a real-world constraint. When se
 
 Both models produced correct, working solutions to all three benchmark prompts. The style of those solutions differed in ways that are consistent and predictable.
 
-Gemma 4 E4B produced more thorough output on the Coding Benchmark: detailed docstrings, explicit type hints, and 4 assert cases. Qwen3 4B produced correct, concise output: a working implementation, a docstring, and 3 assert cases.
+Gemma 4 E4B produced more thorough output on the recorded Coding Benchmark: detailed docstrings, explicit type hints, and 4 assert cases. Qwen3 4B produced correct, concise output: a working implementation, a docstring, and 3 assert cases.
 
-Neither is objectively superior. The preference depends on whether the user values completeness or conciseness. What the benchmark establishes is that this difference is repeatable — not random.
+Neither is objectively superior. The preference depends on whether the user values completeness or conciseness. What the benchmark establishes is that this difference appeared within the recorded Benchmark v1 evidence set.
 
 **Speed variation across categories reflects response length**
 
-Qwen3 4B showed higher throughput on the Reasoning benchmark (49.53 tok/s) compared to Coding (46.84 tok/s) and Refactoring (46.02 tok/s). This is consistent with response length — reasoning responses are typically shorter than full function implementations, and shorter responses tend to produce slightly different throughput readings.
+Qwen3 4B showed higher throughput on the Reasoning benchmark (49.53 tok/s) compared to Coding (46.84 tok/s) and Refactoring (46.02 tok/s). This is consistent with response length, though response length was not isolated as a variable.
 
 Gemma 4 E4B showed less variation (~33, ~32, ~32 tok/s), reflecting its more uniform output length across the three benchmark types.
 
@@ -1394,7 +1400,7 @@ Gemma 4 E4B produced a correct recursive implementation. The output included:
 
 Generation speed: approximately 33 tok/s.
 
-The output met and exceeded the minimum pass criteria. The prompt required at least two assert cases; Gemma produced four. The documentation level was more detailed than strictly required — closer to production code than a quick prototype. This pattern, output depth beyond the minimum threshold, was consistent across Gemma's benchmark runs.
+The output met and exceeded the minimum pass criteria. The prompt required at least two assert cases; Gemma produced four. The documentation level was more detailed than strictly required — closer to production code than a quick prototype. This output-depth pattern was observed in the recorded Gemma benchmark runs.
 
 > Supporting screenshots are available in the repository evidence set: `gemma4-coding-benchmark-v1-1.png` and `gemma4-coding-benchmark-v1-2.png`.
 
@@ -1513,7 +1519,7 @@ The response included step-by-step reasoning before the final answer and correct
 
 Generation speed: 49.53 tok/s — the highest reading recorded across all six benchmark runs in this guide.
 
-Reasoning v1 produces a shorter response than either the Coding or Refactoring prompts. Shorter responses generate at slightly different throughput, which is consistent with this reading being higher than Qwen's Coding and Refactoring figures.
+Reasoning v1 produces a shorter response than either the Coding or Refactoring prompts. Shorter responses can generate at slightly different throughput, which is consistent with this reading being higher than Qwen's Coding and Refactoring figures, though response length was not isolated as a variable.
 
 > Evidence: `qwen3-reasoning-benchmark-v1.png`.
 
@@ -1552,13 +1558,13 @@ RAM usage and cold startup times were not collected during the sessions complete
 
 **Benchmark outcome.** Both models passed all three categories. Neither model failed or produced a partial result on any prompt. From a pass/fail standpoint, the result is a tie.
 
-**Speed.** Qwen3 4B generated at approximately 39% higher throughput across all three runs (46–50 tok/s vs 32–34 tok/s). This gap was consistent across every category, not an outlier reading from a single run. For a single short prompt the difference may not be noticeable. Over a working session involving many longer prompts, it is.
+**Speed.** Qwen3 4B generated at approximately 39% higher throughput across the three recorded runs (46–50 tok/s vs 32–34 tok/s). For a single short prompt the difference may not be noticeable. Over a working session involving many longer prompts, it is.
 
 **Disk footprint.** Qwen3 4B occupies 2.28 GB. Gemma 4 E4B occupies 6.33 GB — approximately 2.7 times larger. On a machine with ample free storage, this difference has limited practical significance. Where storage is constrained or multiple models are installed alongside each other, it becomes a real consideration.
 
-**Output depth.** On Coding v1, Gemma produced more thorough output: additional test cases, explicit `Dict[str, Any]` type hints, and a more detailed docstring. On Refactoring v1, Gemma applied a more aggressive structural simplification. On Reasoning v1, both models produced structurally comparable responses. The pattern held consistently: Gemma leaned toward completeness, Qwen toward conciseness. Both satisfied pass criteria in every category.
+**Output depth.** On Coding v1, Gemma produced more thorough output: additional test cases, explicit `Dict[str, Any]` type hints, and a more detailed docstring. On Refactoring v1, Gemma applied a more aggressive structural simplification. On Reasoning v1, both models produced structurally comparable responses. In the recorded runs, Gemma leaned toward completeness and Qwen toward conciseness. Both satisfied pass criteria in every category.
 
-**Configuration.** Gemma 4 E4B requires no configuration changes before use — load the model and run prompts. Qwen3 4B requires Think mode to be disabled. The setting is changed once per session in LM Studio's model parameters panel. It is not a repeated overhead, but it is a step Gemma does not require. The consequences of forgetting it — prolonged generation without a result — are significant enough to warrant treating it as a mandatory pre-run check.
+**Configuration.** Gemma 4 E4B requires no configuration changes before use — load the model and run prompts. Qwen3 4B requires Think mode to be disabled. The setting is changed once per session where available in LM Studio's model settings. It is not a repeated overhead, but it is a step Gemma does not require. The consequences of forgetting it — prolonged generation without a result — are significant enough to warrant treating it as a mandatory pre-run check.
 
 **Runtime caveat.** As discussed in Chapter 5, Gemma runs as GGUF Q4_K_M and Qwen as MLX 4-bit — different inference paths on Apple Silicon. The 39% speed difference reflects both model design and runtime. Isolating how much of the gap is attributable to each is not possible from this data.
 
@@ -1570,11 +1576,11 @@ The benchmark results establish a specific, bounded claim: both Gemma 4 E4B and 
 
 What the results do provide is a documented, reproducible basis for tradeoff decisions.
 
-**If output completeness is the priority,** the data supports Gemma. On Coding v1, Gemma consistently produced more test cases, more explicit type annotations, and more thorough documentation. For tasks where the output is a finished artefact — code to be deployed, documentation to be shared — that extra depth has practical value.
+**If output completeness is the priority,** the data supports Gemma. On the recorded Coding v1 run, Gemma produced more test cases, more explicit type annotations, and more thorough documentation. For tasks where the output is a finished artefact — code to be deployed, documentation to be shared — that extra depth has practical value.
 
 **If speed or storage efficiency is the priority,** the data supports Qwen. At 46–50 tok/s, responses arrive faster across every category. At 2.28 GB, the model is less than half the size of Gemma. For interactive workflows, iterative prompting, or machines with limited free storage, Qwen's profile is more efficient.
 
-**For local-first pipeline integration** — such as the Phoenix application described in Chapter 4 — both models connect to LM Studio's OpenAI-compatible API at `http://localhost:1234/v1` without modification. Qwen's higher throughput makes it more responsive in workflows that process many prompts sequentially. Gemma's zero-configuration behaviour makes it easier to deploy as a reliable default without an additional setup step.
+**For local-first pipeline integration** — such as the Phoenix application described in Chapter 4 — both models connect to LM Studio's basic OpenAI-compatible chat API at `http://localhost:1234/v1` without modification. Qwen's higher throughput makes it more responsive in workflows that process many prompts sequentially. Gemma's zero-configuration behaviour makes it easier to deploy as a reliable default without an additional setup step.
 
 These are tradeoff decisions grounded in measured evidence. The benchmark does not resolve them — it informs them.
 
@@ -1602,7 +1608,7 @@ These are not flaws in the methodology — they are its documented boundaries. B
 
 Both Gemma 4 E4B and Qwen3 4B passed every Benchmark v1 category on the same hardware, with the same prompts, under the same conditions. Neither model failed.
 
-The benchmark does not declare a winner. It establishes two things: that both models are capable at a defined baseline level, and that they differ in measurable, reproducible ways — speed, disk footprint, output depth, and configuration requirements. Those differences are documented in the evidence files in this repository and reflected in every table in this chapter.
+The benchmark does not declare a winner. It establishes two things: that both models are capable at a defined baseline level, and that they differ in documented ways — speed, disk footprint, output depth, and configuration requirements. Those differences are recorded in the evidence files in this repository and reflected in every table in this chapter.
 
 Understanding what a model can do under controlled conditions is one part of working effectively with local AI. Understanding how to structure tasks, prompts, and workflows around those capabilities is the next.
 
@@ -1663,7 +1669,7 @@ These work because they give HERMES a bounded retrieval task. Open-ended questio
 
 ### Workflow 2: Developer Productivity
 
-Local AI on a developer's machine has a structural advantage over cloud tools: it operates on private codebases, local files, and proprietary logic without any of that context leaving the machine. This matters less for open-source code and more for anything genuinely private.
+Local AI on a developer's machine has a structural advantage over cloud tools: when a local provider is selected, it can operate on private codebases, local files, and proprietary logic without sending that context to a cloud model. This matters less for open-source code and more for anything genuinely private.
 
 #### Code Explanation
 
@@ -1901,7 +1907,7 @@ The diagnostic approach is the same in every case: isolate one variable at a tim
 
 #### The model is too large for available memory
 
-A model that exceeds available unified memory will be partially offloaded to slower storage rather than running fully in RAM. This produces a characteristic slowdown — generation that is consistently much slower than expected, often by an order of magnitude.
+If the model and runtime working set exceed available unified memory, macOS may compress memory or swap to disk, and LM Studio may slow down or fail to load the model.
 
 On a MacBook Air M5 with 16 GB, both models benchmarked for this guide ran at 32–50 tok/s with all layers offloaded to Metal. If observed speed is substantially below this — single digits, for example — memory pressure is the first thing to check.
 
@@ -1947,7 +1953,7 @@ The model must fit into available unified memory to load correctly. If the syste
 
 Gemma 4 E4B at 6.33 GB on an 8 GB machine leaves less than 2 GB for the operating system and all other processes. This can cause load failures or extreme slowness even if the model technically fits on disk.
 
-Fix: Close all non-essential applications before loading. Check the model's disk size before downloading — disk size is a reliable proxy for RAM requirement at the same quantisation level. If a model consistently fails to load, choose a smaller model or a more aggressively quantised variant.
+Fix: Close all non-essential applications before loading. Check the model's disk size before downloading, but treat it as a rough proxy only: runtime overhead, KV cache, context length, and other apps also consume unified memory. If a model consistently fails to load, choose a smaller model or a more aggressively quantised variant.
 
 #### The model file is incomplete or corrupted
 
@@ -1969,7 +1975,7 @@ Fix: Set GPU Layers to Max in LM Studio's model settings. LM Studio will offload
 
 **Likely cause:** Think mode enabled on Qwen3 4B.
 
-**Resolution:** Disable Think mode in LM Studio's model parameters panel before running any structured prompt with Qwen3 4B. This is a per-session setting — confirm it each time the model is loaded.
+**Resolution:** Disable Think mode before running any structured prompt with Qwen3 4B. Depending on LM Studio version and model build, this may appear as Think mode, Enable Thinking, or be controlled with `/no_think`. Confirm the setting each time the model is loaded.
 
 **Other causes to check:**
 
@@ -2042,7 +2048,7 @@ The correct base URL is `http://localhost:1234/v1`.
 
 #### Step 3 — Verify the model identifier
 
-The model identifier in the application must match the ID displayed in LM Studio exactly. Identifiers are case-sensitive.
+The model identifier in the application must match the ID displayed in LM Studio exactly. Identifiers are case-sensitive. If unsure, check LM Studio's model details or call `GET http://localhost:1234/v1/models`.
 
 | Model | Correct identifier |
 |---|---|
@@ -2053,7 +2059,7 @@ A mismatch causes the request to fail or return an unknown model error.
 
 #### Step 4 — Handle API key fields
 
-LM Studio does not require or validate an API key. Some applications require the field to be non-empty regardless. Enter any placeholder value — `local`, `lmstudio`, or any non-empty string — and the connection will proceed.
+For the default localhost-only server, LM Studio does not require or validate an API key. Some applications require the field to be non-empty regardless; enter a placeholder such as `local` or `lmstudio`. If authentication is enabled or the server is exposed beyond localhost, use the token shown by LM Studio.
 
 #### Step 5 — Check the request timeout
 
@@ -2160,7 +2166,7 @@ The practical implication: the usefulness of local AI on a MacBook Air M5 with 1
 
 #### Hardware Is Improving
 
-Apple Silicon generations have delivered consistent improvements to the memory bandwidth and Neural Engine performance relevant to local model inference. Each generation increases what is possible within the same power and thermal envelope.
+Apple Silicon generations have delivered consistent improvements to GPU performance, Metal acceleration, and memory bandwidth relevant to local model inference. Each generation increases what is possible within the same power and thermal envelope.
 
 The unified memory architecture — where CPU, GPU, and AI workloads share the same high-bandwidth memory pool — was a foundational change that made Apple Silicon particularly well-suited for local inference. Subsequent generations have extended this advantage rather than plateauing.
 
@@ -2170,7 +2176,7 @@ Hardware purchased today continues to handle more capable models as those models
 
 Early small models were clearly weaker on reasoning tasks than larger counterparts. That gap is narrowing.
 
-Both Gemma 4 E4B and Qwen3 4B passed Reasoning Benchmark v1 in this guide. This would not have been a reliable outcome with 4B-class models from two years prior. The trajectory is consistent: reasoning capability at small parameter counts is improving with each model generation.
+Both Gemma 4 E4B and Qwen3 4B passed Reasoning Benchmark v1 in this guide. This would not have been a reliable outcome with 4B-class models from two years prior. The observed trajectory is clear: reasoning capability at small parameter counts is improving with each model generation.
 
 More rigorous reasoning benchmarks will reveal where the current limits still lie — Benchmark v1 is a basic test, not a comprehensive one. But the direction of travel is clear.
 
@@ -2226,7 +2232,7 @@ A model that generates at 50 tok/s, passes every benchmark prompt, and integrate
 
 The benchmark results in this guide establish that Gemma 4 E4B and Qwen3 4B pass the tasks put to them. What they cannot establish is whether any of this becomes part of how you actually work. That depends on the choices made after closing the guide.
 
-Local AI is not impressive because the models are fast. It is useful because a Mac you already own can now process your notes, help with your code, assist your research, and support your thinking — without sending any of it to a server you do not control.
+Local AI is not impressive because the models are fast. It is useful because a Mac you already own can now process your notes, help with your code, assist your research, and support your thinking locally — as long as you keep the workflow on local providers and avoid remote tools.
 
 Run a model. Use it for something that matters. Capture what you learn. Build from there.
 
