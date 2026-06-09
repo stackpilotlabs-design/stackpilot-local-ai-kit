@@ -2128,3 +2128,137 @@ Most local AI problems are configuration problems. A model that runs slowly, fai
 The diagnostic approach is the same each time: identify the symptom, isolate the variable, change one thing, and re-test.
 
 Chapter 10 — Next Steps — closes the guide with a practical view of where to go from here: expanding the model library, continuing the benchmark programme, building on the workflows established in Chapter 8, and where the local AI landscape is heading on Apple Silicon hardware.
+
+---
+
+## Chapter 10 — Next Steps
+
+### The Foundation Is in Place
+
+By this point you have installed LM Studio, downloaded and benchmarked two models, connected a local AI runtime to a real application, built repeatable workflows, and worked through the most common problems that arise in practice.
+
+That is the foundation. Everything that comes next builds on it.
+
+---
+
+### Local AI Is a Moving Target
+
+The specific models, tools, and settings described in this guide reflect conditions as they exist in mid-2026. Both will change.
+
+New models are released regularly. LM Studio updates its interface, adds support for new model formats, and changes default behaviours. Quantisation formats improve. Apple Silicon generations increase the memory bandwidth and compute available for inference. A model that is considered fast today may be considered average in two years.
+
+This creates a practical problem for any guide: specifics become outdated.
+
+The way to manage this is to focus on principles rather than configurations. The benchmark methodology in Chapter 6 works for any model, not just Gemma 4 E4B and Qwen3 4B. The prompt patterns in Chapter 8 work regardless of which model is loaded. The troubleshooting approach in Chapter 9 applies whether you are using LM Studio today or a different runtime next year.
+
+What changes: specific model names, generation speeds, file sizes, and tool interfaces.
+
+What does not change: the importance of reproducible evaluation, the value of well-specified prompts, the architecture of local API integration, and the principle that a consistently used simple workflow is worth more than a sophisticated one that gets used once.
+
+---
+
+### Four Directions
+
+There are four natural directions for continuing after this guide. Each represents a different emphasis. None requires starting over — each one extends what is already in place.
+
+#### Become a Better User
+
+The simplest and most immediately useful direction: use what you have built, consistently, for tasks that matter to you. The prompt patterns in Chapter 8 are starting points, not finished products. Every workflow improves with use — as you accumulate observations about what produces good output and what does not, the prompts become more specific and the results more reliable. The gains from consistency compound faster than the gains from switching to a new model.
+
+#### Become a Builder
+
+Extend the local API integration pattern established in Chapter 4. The same architecture — application → local API → runtime → model — works for custom scripts, command-line tools, editor integrations, and multi-step processing pipelines. LM Studio's local server accepts any HTTP client. If you can write a script or a small application that makes an HTTP request, you can build a local AI integration. Phoenix is one example of the pattern applied. There are many others.
+
+#### Become a Researcher
+
+The benchmark programme in this guide is a starting point. Benchmark v1 covers three task types on two models. The next step is straightforward: apply the same methodology to the next model on the list. The prompts, settings, and scoring criteria are already documented in the research repository. The experiment log is structured to receive new entries. The methodology transfers without modification — the only new input required is a model to test.
+
+#### Build Your Own System
+
+The progression from running a model in a chat interface to building workflows and integrations around it is a template for any local AI project. The specific tools and models are swappable. The underlying pattern is not: define the problem clearly, capture evidence as you go, let the documentation drive the output, and produce from the record. That approach works for technical writing, software tools, research notes, and anything else that combines local AI with sustained work over time.
+
+---
+
+### The Future of Local AI
+
+The local AI landscape is changing faster than almost any other area of consumer computing. The changes worth paying attention to are grounded in observable trends.
+
+#### Models Are Getting More Efficient
+
+The improvements in model efficiency over the past two years have been significant and consistent. Models in the 4B parameter class today perform tasks that required 13B or larger models two years ago. This is not primarily a hardware story — it reflects advances in training techniques, data quality, and architecture design that allow smaller models to extract more capability from fewer parameters.
+
+The practical implication: the usefulness of local AI on a MacBook Air M5 with 16 GB will continue to improve without a hardware upgrade. The same machine will run better models, not just the same models faster.
+
+#### Hardware Is Improving
+
+Apple Silicon generations have delivered consistent improvements to the memory bandwidth and Neural Engine performance relevant to local model inference. Each generation increases what is possible within the same power and thermal envelope.
+
+The unified memory architecture — where CPU, GPU, and AI workloads share the same high-bandwidth memory pool — was a foundational change that made Apple Silicon particularly well-suited for local inference. Subsequent generations have extended this advantage rather than plateauing.
+
+Hardware purchased today continues to handle more capable models as those models become available. The investment compounds over time in a way that dedicated GPU hardware for local AI typically does not.
+
+#### Smaller Models Are Becoming More Capable at Reasoning
+
+Early small models were clearly weaker on reasoning tasks than larger counterparts. That gap is narrowing.
+
+Both Gemma 4 E4B and Qwen3 4B passed Reasoning Benchmark v1 in this guide. This would not have been a reliable outcome with 4B-class models from two years prior. The trajectory is consistent: reasoning capability at small parameter counts is improving with each model generation.
+
+More rigorous reasoning benchmarks will reveal where the current limits still lie — Benchmark v1 is a basic test, not a comprehensive one. But the direction of travel is clear.
+
+#### Multimodal Local AI Is Emerging
+
+The benchmark programme in this guide is text-only. This reflects the state of practical multimodal capability on a 16 GB MacBook Air M5 at the time the methodology was designed.
+
+Multimodal local models — models that process both text and images as input — are available and advancing rapidly. Vision models that can receive a screenshot, diagram, or photograph and return a useful text response are approaching practical reliability on consumer hardware.
+
+When that becomes consistent at this hardware tier, the workflow patterns in Chapter 8 expand significantly: note capture that includes screenshots, code review that incorporates output images, research workflows that process diagrams alongside text. This is the next frontier for local AI on consumer Apple Silicon hardware, and it is closer than the current benchmark programme reflects.
+
+#### Tooling Is Improving
+
+LM Studio is one tool in an expanding ecosystem. Ollama, Jan, and other local AI runtimes are developing rapidly and competing on features including model management, API compatibility, and on-device performance optimisation.
+
+The OpenAI-compatible API format has become a de facto standard across both local and cloud runtimes. Applications built against LM Studio's local server today will work with other runtimes as the ecosystem evolves. The architectural investment made in Chapter 4 is not tool-specific — it is format-specific, and the format is stable.
+
+The practical outcome over the next few years: more choice, better interfaces, and less configuration overhead. The core architecture remains stable even as the specific tools improve around it.
+
+---
+
+### Lessons From This Project
+
+These are not lessons about which model to use or how to configure LM Studio. Those are covered in earlier chapters. These are lessons about how to approach any local AI project.
+
+**Methodology over opinion.** An impression of a model's capability is not evidence. A documented benchmark run — same prompt, same settings, same hardware, recorded at the time — is evidence. The discipline of distinguishing between the two is the most useful habit the benchmark programme in this guide develops.
+
+**Workflows over demos.** Producing an impressive output in a single session is easy. Building a workflow that produces consistent, useful output across many sessions is harder and more valuable. The gap between a demo and a workflow is the gap between a tool you try once and a tool you actually use.
+
+**Usefulness over complexity.** More elaborate pipelines and more sophisticated prompt engineering are only valuable if they translate into outcomes you actually care about. The simplest configuration that reliably produces useful output is the right configuration.
+
+**Consistency over constant switching.** A model you understand well and use consistently will produce better results in your specific workflows than one you have just downloaded. The returns from familiarity accumulate slowly and are not visible in a single session. Give a configuration enough time to prove itself before replacing it.
+
+---
+
+### Final Recommendations
+
+* Use one workflow from Chapter 8 consistently for at least two weeks before evaluating whether it is working
+* Keep a note of every time local AI produces output that is not useful — the patterns in those failures are more informative than the patterns in the successes
+* Run Benchmark v1 on the next model you download, using the same methodology and settings from Chapter 6 — do not compare results without identical conditions
+* Maintain the research repository structure: experiment log, per-model benchmark files, comparison document — it makes every future session more useful than the last
+* Resist downloading a new model until the current one has been used consistently for at least a week
+
+---
+
+### Final Thoughts
+
+Local AI on a MacBook Air M5 is not a research project or a tool reserved for developers with specialised hardware. It is practical, available now, and improving steadily.
+
+But capability is not the same as usefulness.
+
+A model that generates at 50 tok/s, passes every benchmark prompt, and integrates cleanly with a local API is not useful in itself. It becomes useful when it is embedded in a workflow, directed at a real task, and used consistently enough that the output quality improves through iteration.
+
+The benchmark results in this guide establish that Gemma 4 E4B and Qwen3 4B pass the tasks put to them. What they cannot establish is whether any of this becomes part of how you actually work. That depends on the choices made after closing the guide.
+
+Local AI is not impressive because the models are fast. It is useful because a Mac you already own can now process your notes, help with your code, assist your research, and support your thinking — without sending any of it to a server you do not control.
+
+Run a model. Use it for something that matters. Capture what you learn. Build from there.
+
+That is the whole of it.
