@@ -18,7 +18,7 @@ This guide covers the complete setup process for running large language models l
 
 ---
 
-## Copyright Notice
+## Copyright Notice {.unnumbered}
 
 Copyright © 2026 StackPilot Labs. All rights reserved.
 
@@ -30,7 +30,7 @@ Purchased through Gumroad. For licensing inquiries: contact StackPilot Labs thro
 
 ---
 
-## Disclaimer
+## Disclaimer {.unnumbered}
 
 This guide documents a specific hardware and software configuration tested at a specific point in time.
 
@@ -46,7 +46,7 @@ The software used: LM Studio (version current as of testing), Gemma 4 E4B (Q4_K_
 
 ---
 
-## Version Information
+## Version Information {.unnumbered}
 
 | Field | Value |
 |---|---|
@@ -62,7 +62,7 @@ This is a fixed release. Updates, if issued, will be delivered through Gumroad a
 
 ---
 
-## About StackPilot Labs
+## About StackPilot Labs {.unnumbered}
 
 StackPilot Labs builds practical technical guides for developers, knowledge workers, and independent builders who want to work with emerging tools without the noise.
 
@@ -72,7 +72,7 @@ This guide is the first product from StackPilot Labs. It was written and tested 
 
 ---
 
-## Who This Guide Is For
+## Who This Guide Is For {.unnumbered}
 
 This guide is for people who want to run AI models locally on a Mac and want to understand what they are doing rather than following steps blindly.
 
@@ -89,7 +89,7 @@ This guide does not assume prior experience with local AI, large language models
 
 ---
 
-## Who This Guide Is Not For
+## Who This Guide Is Not For {.unnumbered}
 
 This guide is not suited for every reader. Be clear about the following before purchasing or reading.
 
@@ -104,7 +104,7 @@ This guide is not suited for every reader. Be clear about the following before p
 
 ---
 
-## How To Use This Guide
+## How To Use This Guide {.unnumbered}
 
 The guide is designed to be read in chapter order on first reading.
 
@@ -124,7 +124,7 @@ Each chapter builds on the previous one. Terms introduced in Chapter 2 are used 
 
 ---
 
-## What Is Included In This Product
+## What Is Included In This Product {.unnumbered}
 
 This product is a single-file technical guide delivered as a PDF.
 
@@ -147,7 +147,7 @@ This product is a single-file technical guide delivered as a PDF.
 
 ---
 
-## Reading Path Recommendations
+## Reading Path Recommendations {.unnumbered}
 
 Three reading paths are recommended based on goal.
 
@@ -2462,7 +2462,7 @@ That is the whole of it.
 
 ---
 
-## Thank You
+## Thank You {.unnumbered}
 
 Thank you for purchasing the Local AI Starter Kit for Mac.
 
@@ -2472,7 +2472,7 @@ If this guide helped you get a local model running and do something useful with 
 
 ---
 
-## Feedback Request
+## Feedback Request {.unnumbered}
 
 This is a v1.0 release. Feedback from early readers directly shapes what gets fixed, clarified, or added in future versions.
 
@@ -2492,7 +2492,7 @@ There is no support SLA on this product. It is a written guide, not a service. B
 
 ---
 
-## Future Updates Policy
+## Future Updates Policy {.unnumbered}
 
 Buyers who purchase this product on Gumroad receive all future updates at no additional charge.
 
@@ -2512,7 +2512,7 @@ When an update is published, Gumroad notifies buyers automatically. The guide UR
 
 ---
 
-## Additional Resources
+## Additional Resources {.unnumbered}
 
 These are the primary tools and references used in this guide. No affiliate arrangements exist with any of these.
 
@@ -2555,7 +2555,7 @@ These are the primary tools and references used in this guide. No affiliate arra
 
 ---
 
-## About the Author
+## About the Author {.unnumbered}
 
 This guide was written by the founder of StackPilot Labs.
 
@@ -2567,7 +2567,7 @@ StackPilot Labs does not have a marketing budget, a PR team, or a social media s
 
 ---
 
-## About StackPilot Labs
+## About StackPilot Labs {.unnumbered}
 
 StackPilot Labs publishes practical technical guides for developers, knowledge workers, and independent builders.
 
@@ -2580,7 +2580,7 @@ The audience is people who build things and want to understand the tools they ar
 
 ---
 
-## Other Planned Products
+## Other Planned Products {.unnumbered}
 
 These are products in various stages of planning or development. No publication dates are committed.
 
@@ -2608,7 +2608,7 @@ A technical guide to designing and building a note capture, processing, and retr
 
 ---
 
-## Final Closing Message
+## Final Closing Message {.unnumbered}
 
 The original question behind this guide was simple: can you run a capable AI model on a MacBook Air without a subscription, without sending data to a cloud service, and without a dedicated GPU?
 

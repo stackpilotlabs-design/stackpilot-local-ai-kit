@@ -153,7 +153,7 @@ pandoc BOOK.md \
   --toc \
   --toc-depth=2 \
   --number-sections \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:margin=2.5cm \
   --variable linestretch=1.4 \
   --variable fontsize=11pt \
@@ -174,7 +174,7 @@ pandoc BOOK.md \
   --toc \
   --toc-depth=2 \
   --number-sections \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:"top=3cm, bottom=3cm, left=2.5cm, right=2.5cm" \
   --variable linestretch=1.4 \
   --variable fontsize=11pt \
@@ -199,7 +199,7 @@ pandoc BOOK.md \
   --metadata-file metadata.yaml \
   --pdf-engine=xelatex \
   --resource-path="$REPO" \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:margin=2.5cm \
   -o local-ai-starter-kit-draft.pdf
 ```
@@ -217,7 +217,7 @@ pandoc BOOK.md \
   --resource-path="$REPO" \
   --toc \
   --toc-depth=2 \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:"top=3cm, bottom=3cm, left=2.5cm, right=2.5cm" \
   --variable fontsize=11pt \
   --variable mainfont="Charter" \
@@ -379,7 +379,7 @@ pandoc BOOK.md \
   --metadata-file metadata.yaml \
   --pdf-engine=xelatex \
   --resource-path="$REPO" \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:margin=2.5cm \
   -o local-ai-starter-kit-draft.pdf
 
@@ -404,7 +404,7 @@ pandoc BOOK.md \
   --toc \
   --toc-depth=2 \
   --number-sections \
-  --highlight-style=monochrome \
+  --syntax-highlighting=monochrome \
   --variable geometry:"top=3cm, bottom=3cm, left=2.5cm, right=2.5cm" \
   --variable linestretch=1.4 \
   --variable fontsize=11pt \
