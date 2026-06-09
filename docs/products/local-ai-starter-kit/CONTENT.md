@@ -1909,3 +1909,222 @@ The benchmark results in previous chapters established that both Gemma 4 E4B and
 The simplest workflow that gets used regularly is worth more than the most sophisticated one that gets used once.
 
 Chapter 9 — Troubleshooting Common Local AI Problems — covers the issues most likely to interrupt these workflows: models that fail to load, speed degradation, memory pressure, configuration errors, and the most common failure modes encountered when running local AI on Apple Silicon hardware.
+
+---
+
+## Chapter 9 — Troubleshooting Common Local AI Problems
+
+### The Troubleshooting Mindset
+
+Most local AI problems are configuration problems. The model itself is rarely broken.
+
+When something goes wrong — slow generation, a response that never arrives, an API that returns an error — the cause is almost always something that can be identified and changed: a setting that was not applied, a server that was not started, a model too large for available memory, a prompt that is poorly structured.
+
+The diagnostic approach is the same in every case: isolate one variable at a time. Change one thing and re-test. If you change the model, the settings, the prompt, and the context length simultaneously, you cannot determine which change resolved the problem. Reproducibility — the ability to reproduce the failure and confirm when it is gone — is the foundation of effective troubleshooting.
+
+---
+
+### Problem 1: The Model Is Slow
+
+**Symptom:** Generation is slower than expected. Responses feel laggy, or a full response takes significantly longer than the hardware should require.
+
+#### The model is too large for available memory
+
+A model that exceeds available unified memory will be partially offloaded to slower storage rather than running fully in RAM. This produces a characteristic slowdown — generation that is consistently much slower than expected, often by an order of magnitude.
+
+On a MacBook Air M5 with 16 GB, both models benchmarked for this guide ran at 32–50 tok/s with all layers offloaded to Metal. If observed speed is substantially below this — single digits, for example — memory pressure is the first thing to check.
+
+Check: Activity Monitor → Memory Pressure. If it is consistently yellow or red during generation, the machine is under pressure.
+
+Fix: Close non-essential applications before loading the model. Qwen3 4B at 2.28 GB leaves considerably more memory headroom than Gemma 4 E4B at 6.33 GB — on a constrained machine, the smaller model will run noticeably faster.
+
+#### Context length is set higher than the task requires
+
+Larger context windows require more memory and more computation per token. Setting context length to 8192 or 16384 for tasks that use only a few hundred tokens adds overhead with no benefit.
+
+Fix: In LM Studio, set context length to the minimum the task requires. The benchmark methodology in this guide used 4096, which is sufficient for coding, refactoring, and reasoning prompts. Start at 2048 and increase only when the model actually needs more context.
+
+#### Flash Attention is disabled
+
+Flash Attention improves both memory efficiency and generation speed on supported hardware. Confirm it is enabled in LM Studio's model settings before loading.
+
+#### Other applications competing for GPU resources
+
+Local AI inference uses the GPU (Metal on Apple Silicon). Video calls, browser-based rendering, and graphics tools compete for the same resource. Every benchmark session in this guide was run with all other applications closed, WiFi disabled, and the machine plugged in — for exactly this reason.
+
+Fix: Close competing applications before running generation-heavy tasks.
+
+#### Speed variation between prompts is expected
+
+Shorter responses generate at slightly different throughput than longer ones. The Qwen3 4B Reasoning v1 run produced 49.53 tok/s compared to 46.84 tok/s for Coding v1, because the reasoning response was shorter. This is normal behaviour, not inconsistency.
+
+---
+
+### Problem 2: The Model Fails to Load
+
+**Symptom:** LM Studio shows an error when loading the model, or the model appears to load briefly and returns to an unloaded state.
+
+#### Not enough RAM for the model size
+
+The model must fit into available unified memory to load correctly. If the system does not have sufficient free RAM, LM Studio will fail to load the model or produce an out-of-memory error.
+
+| Available memory | What fits comfortably |
+|---|---|
+| 8 GB | Up to ~2–3 GB models. Qwen3 4B (2.28 GB) fits with room for the OS and other processes. |
+| 16 GB | Up to ~8–9 GB models, depending on what else is running. |
+| 24 GB+ | Larger models in the 10–13 GB range. |
+
+Gemma 4 E4B at 6.33 GB on an 8 GB machine leaves less than 2 GB for the operating system and all other processes. This can cause load failures or extreme slowness even if the model technically fits on disk.
+
+Fix: Close all non-essential applications before loading. Check the model's disk size before downloading — disk size is a reliable proxy for RAM requirement at the same quantisation level. If a model consistently fails to load, choose a smaller model or a more aggressively quantised variant.
+
+#### The model file is incomplete or corrupted
+
+A download interrupted mid-transfer or a file system error can produce a model file that LM Studio cannot parse.
+
+Fix: In LM Studio's model browser, delete the model entry and re-download it. Confirm the download completes without errors before attempting to load.
+
+#### GPU Layers not set to Max
+
+Setting GPU layers to a value the hardware cannot support can cause load failures on some configurations.
+
+Fix: Set GPU Layers to Max in LM Studio's model settings. LM Studio will offload as many layers as hardware allows. This is the setting used for every benchmark session in this guide.
+
+---
+
+### Problem 3: Generation Starts But Never Completes
+
+**Symptom:** The model begins generating tokens and the stats bar shows ongoing activity, but no final response is produced. Generation continues indefinitely.
+
+**Likely cause:** Think mode enabled on Qwen3 4B.
+
+During the initial Coding Benchmark v1 run with Qwen3 4B, Think mode was enabled. The model generated tokens extensively without converging on a final answer. The session was terminated, the model was ejected and reloaded, and Think mode was disabled before running the benchmark again.
+
+**Resolution:** Disable Think mode in LM Studio's model parameters panel before running any structured prompt with Qwen3 4B. This is a per-session setting — confirm it each time the model is loaded.
+
+**Other causes to check:**
+
+* Context length set too short — if the model runs out of context window before completing a long response, it may stall. Increase context length and retry with a fresh session.
+* Prompt is too long or complex for the model's capability at this scale. Try splitting the task into two or three smaller prompts.
+
+> For full background on the Think mode behaviour observed during benchmarking, see the Qwen3 4B case study in Chapter 5 and the Coding Benchmark Results in Chapter 7.
+
+---
+
+### Problem 4: Poor Output Quality
+
+**Symptom:** The model produces output that is vague, incomplete, off-topic, or fails to meet the requirements of the task.
+
+**Diagnose in this order:**
+
+#### The prompt is underspecified
+
+This is the most common cause of poor output and the easiest to fix.
+
+An underspecified prompt — *"explain this code"* — gives the model no constraints. It does not know the audience, the level of detail required, the format expected, or the specific aspect to explain. The model fills the gap with assumptions, and those assumptions may not match what you need.
+
+A well-specified prompt — *"explain what this function does, step by step, in language suitable for a junior developer. Focus on the loop logic and the return value"* — produces reliably better output because the model has the information it needs.
+
+The Benchmark v1 prompts used in this guide are concrete examples of constrained prompts — each one specifies exactly what is required, including format, requirements, and edge cases. Review them in `examples/benchmark-prompts.md` as a reference for prompt structure.
+
+Fix: Add constraints to every prompt. Specify the audience, the format, the level of detail, and any requirements the output must meet.
+
+#### Context from a previous session is influencing the output
+
+Leftover context from an earlier conversation can subtly affect responses in ways that are hard to detect. Every benchmark in this guide ran in a fresh chat session for this reason.
+
+Fix: Start a new chat session for each distinct task. Do not assume that a long session has no accumulated context affecting the current response.
+
+#### The task is outside the 4B-class capability boundary
+
+Gemma 4 E4B and Qwen3 4B are capable within their scope. Extended multi-step reasoning chains, tasks requiring broad factual recall, long-form synthesis across many sources, and highly domain-specific content are areas where small models frequently produce weak output regardless of prompt quality.
+
+Fix: If output quality is consistently poor on a specific task type despite well-specified prompts, try the same prompt with a larger model or a cloud provider as a reference point. If the larger model produces substantially better output, the task is likely at the edge of the 4B-class capability boundary for this hardware.
+
+#### The model is being asked to retrieve what it does not have
+
+Local models do not have access to current events, private codebases, internal documents, or anything outside their training data. Asking a local model what happened last week, what is in a specific private file, or what a recent API update changed will produce a hallucinated or heavily hedged response.
+
+Fix: Provide the relevant content in the prompt. Local models are effective at processing content you supply directly. They are not reliable at retrieving content they were never given.
+
+---
+
+### Problem 5: API Integration Problems
+
+**Symptom:** An application connecting to LM Studio returns an error, fails to receive a response, or shows a connection timeout.
+
+These steps reflect the diagnosis process used during the Phoenix integration in Chapter 4.
+
+#### Step 1 — Confirm the local server is running
+
+Loading a model in LM Studio does not automatically start the API server. The server must be started explicitly from LM Studio's Developer or Server panel.
+
+Check: Navigate to the server panel in LM Studio. Confirm the status shows the server is running and listening on port 1234 before attempting any external connection.
+
+#### Step 2 — Verify the base URL
+
+The correct base URL is `http://localhost:1234/v1`.
+
+| Common mistake | Correct value |
+|---|---|
+| `http://localhost:1234` | `http://localhost:1234/v1` (missing `/v1`) |
+| `https://localhost:1234/v1` | `http://localhost:1234/v1` (https, not http) |
+| `http://localhost:5001/v1` | `http://localhost:1234/v1` (wrong port) |
+
+#### Step 3 — Verify the model identifier
+
+The model identifier in the application must match the ID displayed in LM Studio exactly. Identifiers are case-sensitive.
+
+| Model | Correct identifier |
+|---|---|
+| Gemma 4 E4B | `google/gemma-4-e4b` |
+| Qwen3 4B | `qwen/qwen3-4b` |
+
+A mismatch causes the request to fail or return an unknown model error.
+
+#### Step 4 — Handle API key fields
+
+LM Studio does not require or validate an API key. Some applications require the field to be non-empty regardless. Enter any placeholder value — `local`, `lmstudio`, or any non-empty string — and the connection will proceed.
+
+#### Step 5 — Check the request timeout
+
+Local models on consumer hardware can take longer to respond than cloud APIs, particularly for longer prompts. A short application timeout — 10 or 30 seconds — will cut the request off before the model finishes generating.
+
+In the Phoenix integration, local providers use a 120-second timeout compared to 60 seconds for cloud providers. If requests consistently time out on longer prompts, check whether the application's timeout can be increased.
+
+---
+
+### Preventative Practices
+
+Applying these checks before each session prevents most of the problems described in this chapter.
+
+**Before loading a model:**
+
+* Confirm the model size fits within available memory
+* Close non-essential applications to free memory and reduce GPU competition
+* Set GPU Layers to Max
+* Confirm Think mode is disabled for Qwen3 4B
+* Set context length to the minimum required for the task
+
+**Before connecting an application to LM Studio:**
+
+* Confirm the local server is running in LM Studio's server panel
+* Confirm the base URL is `http://localhost:1234/v1`
+* Confirm the model identifier matches the LM Studio model ID exactly
+* Set the application's request timeout to at least 120 seconds
+
+**When output quality is lower than expected:**
+
+* Re-read the prompt — check for missing constraints, format requirements, or missing context
+* Start a new chat session to eliminate context contamination
+* Test the same prompt with a different model to isolate whether the issue is the prompt or the model
+
+---
+
+### Key Takeaway
+
+Most local AI problems are configuration problems. A model that runs slowly, fails to load, generates forever, or returns poor output is nearly always pointing at a specific, fixable cause — a setting, a resource constraint, a prompt structure, or a connection detail.
+
+The diagnostic approach is the same each time: identify the symptom, isolate the variable, change one thing, and re-test.
+
+Chapter 10 — Next Steps — closes the guide with a practical view of where to go from here: expanding the model library, continuing the benchmark programme, building on the workflows established in Chapter 8, and where the local AI landscape is heading on Apple Silicon hardware.
