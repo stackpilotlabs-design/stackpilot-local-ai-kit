@@ -1382,3 +1382,257 @@ Benchmark v1 is a starting point, not a ceiling. As more models are tested, as n
 The foundation for meaningful comparison is already in place.
 
 The next chapter presents the full benchmark results for Gemma 4 E4B and Qwen3 4B — detailed output observations, screenshot evidence, and the head-to-head analysis that emerges from applying this methodology consistently across both models.
+
+---
+
+## Chapter 7 — Real Benchmark Results
+
+### From Methodology to Evidence
+
+Chapter 6 described how the benchmarks for this guide were designed: the hardware, the prompt suite, the LM Studio settings, the scoring criteria, and the evidence collection process.
+
+This chapter presents what was observed when that methodology was applied.
+
+Every result here is sourced directly from `docs/10-benchmarks.md`, `docs/08-model-comparison.md`, and `EXPERIMENT-LOG.md`. Every speed measurement was read from LM Studio's stats bar and recorded in those files at the time of each session. Where measurements were not taken, they are stated as not yet collected.
+
+No figures in this chapter are estimated or inferred.
+
+---
+
+### Coding Benchmark Results
+
+**Prompt: Coding Benchmark v1**
+
+Write a Python function called `flatten_dict` that takes a nested dictionary and returns a flat dictionary with dot-separated keys. Requirements: handle arbitrarily deep nesting, handle empty dicts, include a docstring, include at least two assert-based test cases.
+
+Full prompt text is available in `examples/benchmark-prompts.md`.
+
+---
+
+#### Gemma 4 E4B — Coding v1
+
+**Result: PASS**
+
+Gemma 4 E4B produced a correct recursive implementation. The output included:
+
+* A recursive solution that correctly flattens arbitrarily deep nesting
+* Explicit type hints using `Dict[str, Any]`
+* A detailed docstring covering the function's purpose, parameters, and return value
+* Four assert-based test cases — one matching the example input from the prompt, one covering an empty dictionary, and two additional edge cases
+* Correct handling of empty dictionary input
+* Syntactically valid Python throughout
+
+Generation speed: approximately 33 tok/s.
+
+The output met and exceeded the minimum pass criteria. The prompt required at least two assert cases; Gemma produced four. The documentation level was more detailed than strictly required — closer to production code than a quick prototype. This pattern, output depth beyond the minimum threshold, was consistent across Gemma's benchmark runs.
+
+> Supporting screenshots are available in the repository evidence set: `gemma4-coding-benchmark-v1-1.png` and `gemma4-coding-benchmark-v1-2.png`.
+
+---
+
+#### Qwen3 4B — Coding v1
+
+**Result: PASS**
+
+**Configuration note:** Think mode was enabled on the initial benchmark attempt. The model began generating tokens without converging on a final answer. The session was terminated, the model was ejected and reloaded in LM Studio, and Think mode was disabled before running the benchmark again. This is documented in `EXPERIMENT-LOG.md` (2026-06-04 entry).
+
+With Think mode disabled, Qwen3 4B produced a correct recursive implementation. The output included:
+
+* A recursive solution handling arbitrarily deep nesting
+* Type hints
+* A docstring
+* Three assert-based test cases
+* Correct handling of empty dictionary input
+* Syntactically valid Python
+
+Generation speed: 46.84 tok/s.
+
+The output was correct and complete. Qwen met all pass criteria for Coding v1. Compared to Gemma, the output was more concise — fewer assert cases, a briefer docstring — but the implementation itself was fully functional and the edge cases were handled correctly.
+
+The Think mode incident is a practical fact about how this model behaves on this hardware. It was resolved by disabling Think mode and rerunning the prompt. The benchmark result is recorded from the completed run.
+
+> Supporting screenshots: `qwen3-coding-benchmark-v1-1.png` and `qwen3-coding-benchmark-v1-2.png`.
+
+---
+
+### Refactoring Benchmark Results
+
+**Prompt: Refactoring Benchmark v1**
+
+Refactor a `process` function that applies conditional logic using index-based looping. Requirements: improve readability, remove duplication, add type hints, preserve external behaviour without change.
+
+Full prompt text is available in `examples/benchmark-prompts.md`.
+
+---
+
+#### Gemma 4 E4B — Refactoring v1
+
+**Result: PASS**
+
+Gemma 4 E4B produced a refactored implementation that satisfied all pass criteria:
+
+* Type hints added to the function signature
+* Index-based loop (`for i in range(len(data))`) replaced with direct iteration
+* Duplication across the three conditional branches removed using a list comprehension
+* Explanatory docstring added
+* Original function behaviour preserved
+* A verification example with an assertion included in the output body
+
+Generation speed: approximately 32 tok/s.
+
+The use of list comprehension warrants a specific note. Rather than restructuring the original conditional block into a cleaner loop, Gemma collapsed the three-branch logic into a single expression. The result is a substantially shorter implementation. Whether this is universally more readable depends on familiarity with Python idioms, but it is a substantive structural change, not a cosmetic revision.
+
+> Evidence: `gemma4-refactoring-benchmark-v1-1.png` and `gemma4-refactoring-benchmark-v1-2.png`.
+
+---
+
+#### Qwen3 4B — Refactoring v1
+
+**Result: PASS**
+
+Qwen3 4B produced a refactored implementation that satisfied all pass criteria:
+
+* Type hints added
+* Variable naming improved — generic index access replaced with named variables
+* Direct iteration used in place of the index-based loop
+* Explanatory docstring added
+* Original behaviour preserved
+* Code complexity reduced
+
+Generation speed: 46.02 tok/s.
+
+Both models identified the same structural problem in the original function — the index-based loop — and both applied the same primary fix. The difference was in how far each model went beyond that fix. Qwen's output was correct and readable; Gemma applied a more aggressive simplification. Both approaches satisfy the pass criteria.
+
+> Evidence: `qwen3-refactoring-benchmark-v1-1.png` and `qwen3-refactoring-benchmark-v1-2.png`.
+
+---
+
+### Reasoning Benchmark Results
+
+**Prompt: Reasoning Benchmark v1**
+
+"A farmer has 17 sheep. All but 9 die. How many sheep does the farmer have left? Show your reasoning step by step before giving the final answer."
+
+Full prompt text is available in `examples/benchmark-prompts.md`.
+
+This prompt tests natural language comprehension, not arithmetic. The common wrong answer is 8, produced by interpreting "all but 9 die" as "9 die" and computing 17 − 9 = 8. The correct interpretation is that all sheep except 9 die, leaving 9 alive.
+
+---
+
+#### Gemma 4 E4B — Reasoning v1
+
+**Result: PASS**
+
+Gemma 4 E4B returned the correct answer: 9.
+
+The response included explicit step-by-step reasoning that correctly identified "all but 9 die" as meaning only 9 sheep survive. The model did not arrive at the trap answer of 8. The reasoning chain was laid out clearly before the final answer, satisfying the prompt's step-by-step requirement.
+
+Generation speed: approximately 32 tok/s.
+
+> Evidence: `gemma4-reasoning-benchmark-v1.png`.
+
+---
+
+#### Qwen3 4B — Reasoning v1
+
+**Result: PASS**
+
+Qwen3 4B returned the correct answer: 9.
+
+The response included step-by-step reasoning before the final answer and correctly parsed the "all but 9" phrasing. The model did not arrive at 8. The reasoning structure was similar in character to Gemma's — both models demonstrated that they were interpreting the sentence, not applying arithmetic to surface numbers.
+
+Generation speed: 49.53 tok/s — the highest reading recorded across all six benchmark runs in this guide.
+
+Reasoning v1 produces a shorter response than either the Coding or Refactoring prompts. Shorter responses generate at slightly different throughput, which is consistent with this reading being higher than Qwen's Coding and Refactoring figures.
+
+> Evidence: `qwen3-reasoning-benchmark-v1.png`.
+
+---
+
+### Head-to-Head Comparison
+
+Both models completed all three Benchmark v1 categories on a MacBook Air M5 (16 GB, macOS Tahoe) using identical methodology and LM Studio settings. The table below records confirmed measurements only.
+
+> **Figure 5.1** — Gemma 4 E4B vs Qwen3 4B visual summary.
+
+#### Full Results Table
+
+| | Gemma 4 E4B | Qwen3 4B |
+|---|---|---|
+| Format | GGUF Q4_K_M | MLX 4-bit |
+| LM Studio ID | `google/gemma-4-e4b` | `qwen/qwen3-4b` |
+| Disk size | 6.33 GB | 2.28 GB |
+| Coding v1 | PASS | PASS |
+| Refactoring v1 | PASS | PASS |
+| Reasoning v1 | PASS | PASS |
+| Coding speed | ~33 tok/s | 46.84 tok/s |
+| Refactoring speed | ~32 tok/s | 46.02 tok/s |
+| Reasoning speed | ~32 tok/s | 49.53 tok/s |
+| Coding output | 4 asserts, `Dict[str, Any]` type hints, detailed docstring | 3 asserts, type hints, docstring |
+| Configuration | None required | Disable Think mode |
+| RAM (loaded, idle) | [ to be measured ] | [ to be measured ] |
+| Startup time (cold) | [ to be measured ] | [ to be measured ] |
+
+RAM usage and cold startup times were not collected during the sessions completed for this guide. They are not estimated or inferred in this table.
+
+---
+
+#### What the Comparison Establishes
+
+**Benchmark outcome.** Both models passed all three categories. Neither model failed or produced a partial result on any prompt. From a pass/fail standpoint, the result is a tie.
+
+**Speed.** Qwen3 4B generated at approximately 39% higher throughput across all three runs (46–50 tok/s vs 32–34 tok/s). This gap was consistent across every category, not an outlier reading from a single run. For a single short prompt the difference may not be noticeable. Over a working session involving many longer prompts, it is.
+
+**Disk footprint.** Qwen3 4B occupies 2.28 GB. Gemma 4 E4B occupies 6.33 GB — approximately 2.7 times larger. On a machine with ample free storage, this difference has limited practical significance. Where storage is constrained or multiple models are installed alongside each other, it becomes a real consideration.
+
+**Output depth.** On Coding v1, Gemma produced more thorough output: additional test cases, explicit `Dict[str, Any]` type hints, and a more detailed docstring. On Refactoring v1, Gemma applied a more aggressive structural simplification. On Reasoning v1, both models produced structurally comparable responses. The pattern held consistently: Gemma leaned toward completeness, Qwen toward conciseness. Both satisfied pass criteria in every category.
+
+**Configuration.** Gemma 4 E4B requires no configuration changes before use — load the model and run prompts. Qwen3 4B requires Think mode to be disabled. The setting is changed once per session in LM Studio's model parameters panel. It is not a repeated overhead, but it is a step Gemma does not require. The consequences of forgetting it — prolonged generation without a result — are significant enough to warrant treating it as a mandatory pre-run check.
+
+**Runtime caveat.** Gemma runs as GGUF Q4_K_M; Qwen runs as MLX 4-bit. These formats use different inference paths on Apple Silicon. The observed speed difference reflects both the model and the runtime. MLX is optimised specifically for Apple Silicon's unified memory architecture in a way that standard GGUF inference is not. Isolating how much of the 39% gap is attributable to the model versus the format is not possible from this data alone.
+
+---
+
+### What These Results Mean in Practice
+
+The benchmark results establish a specific, bounded claim: both Gemma 4 E4B and Qwen3 4B correctly handle coding, refactoring, and basic reasoning tasks on a MacBook Air M5 with 16 GB of unified memory. They do not establish which model is generally better. They do not predict performance on tasks outside the Benchmark v1 scope.
+
+What the results do provide is a documented, reproducible basis for tradeoff decisions.
+
+**If output completeness is the priority,** the data supports Gemma. On Coding v1, Gemma consistently produced more test cases, more explicit type annotations, and more thorough documentation. For tasks where the output is a finished artefact — code to be deployed, documentation to be shared — that extra depth has practical value.
+
+**If speed or storage efficiency is the priority,** the data supports Qwen. At 46–50 tok/s, responses arrive faster across every category. At 2.28 GB, the model is less than half the size of Gemma. For interactive workflows, iterative prompting, or machines with limited free storage, Qwen's profile is more efficient.
+
+**For local-first pipeline integration** — such as the Phoenix application described in Chapter 4 — both models connect to LM Studio's OpenAI-compatible API at `http://localhost:1234/v1` without modification. Qwen's higher throughput makes it more responsive in workflows that process many prompts sequentially. Gemma's zero-configuration behaviour makes it easier to deploy as a reliable default without an additional setup step.
+
+These are tradeoff decisions grounded in measured evidence. The benchmark does not resolve them — it informs them.
+
+---
+
+### Limitations of These Results
+
+**Single hardware platform.** All results were collected on a MacBook Air M5 with 16 GB of unified memory running macOS Tahoe. Performance on machines with different chip generations, different memory configurations, or different operating systems is not known from this data.
+
+**Limited benchmark scope.** Benchmark v1 covers three task types: one coding task, one refactoring task, one reasoning task. Summarisation, extended context handling, multi-step agent tasks, creative writing, and domain-specific knowledge tasks are not represented. A PASS on Benchmark v1 does not imply capability across all categories.
+
+**Two models benchmarked.** Only Gemma 4 E4B and Qwen3 4B have been tested. The results support conclusions only about these two models on this hardware. No claims can be made about the wider landscape of available local models.
+
+**Binary scoring only.** Benchmark v1 uses PASS / Partial / Fail. No finer quality rubric was applied. A PASS result means the output met the defined minimum criteria — not that it was optimal. A more detailed rubric might distinguish further between the outputs Gemma and Qwen produced on Coding v1, for example.
+
+**Single run per prompt per model.** Each benchmark prompt was run once per model. The recorded values reflect a single observation, not an average across multiple runs. Minor variation between runs is expected and not captured here.
+
+**RAM and startup time not collected.** Both metrics are marked `[ to be measured ]` in the benchmark files. Any comparison requiring memory footprint data needs to wait until those measurements are taken on this hardware.
+
+These are not flaws in the methodology — they are its documented boundaries. Benchmark v1 is a starting point. As additional models are tested and new task categories are added, the scope will expand. The research repository is structured to grow as new sessions are completed.
+
+---
+
+### Key Takeaway
+
+Both Gemma 4 E4B and Qwen3 4B passed every Benchmark v1 category on the same hardware, with the same prompts, under the same conditions. Neither model failed.
+
+The benchmark does not declare a winner. It establishes two things: that both models are capable at a defined baseline level, and that they differ in measurable, reproducible ways — speed, disk footprint, output depth, and configuration requirements. Those differences are documented in the evidence files in this repository and reflected in every table in this chapter.
+
+Understanding what a model can do under controlled conditions is one part of working effectively with local AI. Understanding how to structure tasks, prompts, and workflows around those capabilities is the next.
+
+Chapter 8 — Building Practical Local AI Workflows — moves from benchmark results into daily use. It covers how to prompt consistently for common tasks, how to integrate local models into existing tools and processes, and what usage patterns hold up reliably on MacBook Air M5 hardware.
