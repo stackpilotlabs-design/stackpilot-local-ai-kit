@@ -108,7 +108,7 @@ Local AI is no longer limited to researchers or people with expensive hardware.
 
 Modern Apple Silicon laptops can run capable language models directly on-device, offering a compelling combination of privacy, control, and performance.
 
-The remainder of this guide focuses on helping you build a practical local AI workflow using tools such as LM Studio and Ollama while avoiding the common mistakes encountered by most beginners.
+The remainder of this guide focuses on building a practical local AI workflow using LM Studio as the primary runtime. Ollama is part of the broader local AI ecosystem and is referenced where relevant, but LM Studio is the tool used for every example, benchmark, and integration in this guide.
 
 
 ## Chapter 2 — Hardware Requirements
@@ -387,7 +387,7 @@ Once running, the endpoint is available at:
 http://localhost:1234/v1
 ```
 
-Any application running on the same machine can now send requests to this address and receive responses from your locally loaded model.
+Any application running on the same machine can now send requests to this address and receive responses from your locally loaded model. What that means in practice — and why it opens up a much larger range of uses than the chat window — is explained in the next section.
 
 ---
 
@@ -414,37 +414,9 @@ No API key is required when running locally. Some applications require an API ke
 
 The OpenAI-compatible API becomes immediately useful when connecting it to real applications.
 
-```
-Phoenix
-    ↓
-LM Studio API Server
-    ↓
-Gemma 4 E4B
-    ↓
-Local Response
-```
+Phoenix is a personal knowledge management application used throughout this guide as a worked example of local AI in practice. Connecting it to LM Studio requires only a base URL (`http://localhost:1234/v1`) and a model identifier — no code changes, no infrastructure setup. Redirecting those two values is sufficient.
 
-Phoenix is a personal second-brain application built to run locally on a Mac. It is designed to support personal knowledge management, research workflows, and daily capture — and it includes a configurable LLM provider system that supports LM Studio, Ollama, Anthropic, and OpenRouter.
-
-Connecting Phoenix to LM Studio requires three values in the Settings screen:
-
-* Provider: LM Studio (local)
-* Base URL: `http://localhost:1234/v1`
-* Model: `google/gemma-4-e4b`
-
-After saving the configuration, the Test Connection button confirms whether the integration is working. A successful result displays:
-
-```
-Connection OK — replied: "OK"
-```
-
-At this point, Phoenix is using Gemma 4 E4B running on LM Studio — with no cloud connection involved.
-
-The practical implications are significant.
-
-A real application, handling personal notes, research material, and daily capture, is now processing AI requests entirely on-device. No prompts leave the machine. No API subscription is required. The workflow continues to function with no internet connection.
-
-This is exactly the kind of local AI workflow described in Chapter 1 — and it required no code changes to Phoenix, no infrastructure setup, and no external service. Redirecting the base URL and model identifier was sufficient.
+Chapter 4 examines this integration in full: what Phoenix does, how it uses the local model for real tasks, and what the architecture looks like in practice.
 
 ---
 
@@ -454,13 +426,9 @@ LM Studio removes most of the friction from getting started with local AI.
 
 Installation is a standard macOS process. The model browser makes downloading Gemma 4 E4B and Qwen3 4B a few clicks. The chat interface provides immediate feedback on model capability and speed. And the local server turns your Mac into an OpenAI-compatible AI backend that real applications can connect to.
 
-The Phoenix integration in this chapter is not a hypothetical example. It is a working local AI setup connected to a real productivity application, running entirely on a MacBook Air M5 without any cloud dependency.
+At this point you have successfully downloaded a model, loaded it into memory, interacted with it through chat, exposed it through an API, and pointed a real application at it. That is already more than most people ever do with local AI.
 
-The next chapter goes deeper into real application integration — using Phoenix as a worked example of what a local AI-powered personal tool actually looks like.
-
-At this point you have successfully downloaded a model, loaded it into memory, interacted with it through chat, exposed it through an API, and connected it to a real application.
-
-That is already more than most people ever do with local AI.
+The next chapter goes deeper — using Phoenix as a worked example of what a local AI-powered application actually looks like in daily use.
 
 
 ## Chapter 4 — From Chat to Applications
@@ -514,6 +482,8 @@ This is the same principle that makes web services composable. The API becomes t
 ---
 
 ### Understanding Local AI Architecture
+
+The mental model above works because of a specific technical decision: LM Studio implements the same API format used by cloud providers.
 
 The OpenAI Chat Completions API format is now the de facto standard for interacting with language models, both cloud-hosted and local.
 
@@ -636,6 +606,8 @@ The abstraction also has a practical development benefit. During experimentation
 
 ### When Local AI Wins
 
+That architectural flexibility also points to a more important question: which tasks are simply better suited to running locally, regardless of cost?
+
 Not every task benefits equally from local AI. There are specific categories where local AI has a structural advantage that cloud models cannot replicate.
 
 #### Privacy-Sensitive Content
@@ -733,7 +705,7 @@ The Qwen family is notable for producing fast, compact, and highly capable model
 
 Qwen models have an MLX variant available, which runs natively optimised on Apple Silicon and delivers higher throughput than equivalent GGUF builds on M-series chips.
 
-One important quirk: Qwen3 includes a Think mode designed for extended reasoning. In the benchmark research for this guide, Think mode enabled caused prolonged generation without a final answer. Think mode should be disabled for general use.
+One important quirk: Qwen3 includes a Think mode that must be disabled for general use on this hardware — covered in detail in the Think Mode section of the Qwen3 4B case study below.
 
 #### Llama
 
@@ -752,6 +724,8 @@ The DeepSeek family has attracted attention for strong reasoning capabilities, p
 Mistral is developed by Mistral AI.
 
 The Mistral family produces compact, efficient models with strong general-purpose performance. Widely adopted for instruction following and available in many GGUF variants suitable for Apple Silicon.
+
+Of these families, Gemma and Qwen have been benchmarked on the reference hardware for this guide. The case studies that follow are based on those measured results.
 
 ---
 
@@ -802,6 +776,8 @@ Gemma 4 E4B is a 4-billion-parameter model from Google DeepMind, benchmarked in 
 * Users who value stable, predictable behaviour without configuration
 * Learning workflows where seeing complete examples is more valuable than fast responses
 
+The next model benchmarked on the same hardware takes a different approach — optimising for speed and compact footprint over output thoroughness.
+
 ---
 
 ### Case Study: Qwen3 4B
@@ -829,9 +805,7 @@ Qwen3 4B is a 4-billion-parameter model from Alibaba's Qwen team, benchmarked in
 
 #### Weaknesses
 
-**Think mode must be disabled.** Qwen3 4B includes a Think mode designed for extended chain-of-thought reasoning. In the benchmark research for this guide, enabling Think mode on the initial Coding v1 attempt caused prolonged token generation without producing a final answer. The model was ejected and reloaded; the benchmark was completed with Think mode disabled.
-
-**Think mode should be disabled for general use on this hardware.**
+**Think mode must be disabled.** For general use on this hardware, Think mode must be turned off before running prompts. The full explanation and practical guidance are in the Think Mode section below.
 
 **More concise output.** On Coding v1, Qwen produced 3 assert cases compared to Gemma's 4, and the overall output was more concise. For tasks where completeness and thoroughness matter, this difference is worth considering.
 
@@ -1281,9 +1255,7 @@ These observations emerged directly from the benchmark sessions documented in th
 
 **Think mode must be managed explicitly for Qwen3 4B**
 
-During the initial Coding Benchmark v1 run with Qwen3 4B, Think mode was enabled. The model began generating extensively without producing a final answer. The session was terminated, the model was ejected and reloaded in LM Studio, and Think mode was disabled before running the benchmark again.
-
-This is the most significant configuration note for Qwen3 4B on this hardware. Think mode is not universally harmful — it is designed to improve reasoning on complex multi-step problems. But on a MacBook Air M5 (16 GB) with this model, it can cause generation to stall on structured tasks. Disable it before running any benchmark prompt.
+This is the most significant configuration note for Qwen3 4B on this hardware: disable Think mode before running any benchmark prompt. The behaviour, its cause, and full practical guidance are documented in Chapter 5 — Think Mode — Practical Guidance.
 
 **GGUF and MLX are not directly comparable formats**
 
@@ -1403,9 +1375,7 @@ No figures in this chapter are estimated or inferred.
 
 **Prompt: Coding Benchmark v1**
 
-Write a Python function called `flatten_dict` that takes a nested dictionary and returns a flat dictionary with dot-separated keys. Requirements: handle arbitrarily deep nesting, handle empty dicts, include a docstring, include at least two assert-based test cases.
-
-Full prompt text is available in `examples/benchmark-prompts.md`.
+Full prompt text and pass criteria are documented in Chapter 6. *(Also available in `examples/benchmark-prompts.md`.)*
 
 ---
 
@@ -1434,7 +1404,7 @@ The output met and exceeded the minimum pass criteria. The prompt required at le
 
 **Result: PASS**
 
-**Configuration note:** Think mode was enabled on the initial benchmark attempt. The model began generating tokens without converging on a final answer. The session was terminated, the model was ejected and reloaded in LM Studio, and Think mode was disabled before running the benchmark again. This is documented in `EXPERIMENT-LOG.md` (2026-06-04 entry).
+**Configuration note:** Think mode was enabled on the initial attempt and caused prolonged generation without a final answer. The model was ejected, reloaded, and Think mode disabled before the benchmark was run. Full guidance in Chapter 5 — Think Mode — Practical Guidance. Session documented in `EXPERIMENT-LOG.md` (2026-06-04 entry).
 
 With Think mode disabled, Qwen3 4B produced a correct recursive implementation. The output included:
 
@@ -1457,11 +1427,11 @@ The Think mode incident is a practical fact about how this model behaves on this
 
 ### Refactoring Benchmark Results
 
+Both models produced correct implementations on Coding v1. The Refactoring task tests a distinct skill: understanding existing code, identifying its problems, and improving it without changing what it does.
+
 **Prompt: Refactoring Benchmark v1**
 
-Refactor a `process` function that applies conditional logic using index-based looping. Requirements: improve readability, remove duplication, add type hints, preserve external behaviour without change.
-
-Full prompt text is available in `examples/benchmark-prompts.md`.
+Full prompt text and pass criteria are documented in Chapter 6. *(Also available in `examples/benchmark-prompts.md`.)*
 
 ---
 
@@ -1509,11 +1479,11 @@ Both models identified the same structural problem in the original function — 
 
 ### Reasoning Benchmark Results
 
+The final benchmark category moves away from code entirely. Reasoning v1 tests whether a model reads language accurately or defaults to arithmetic on the numbers it sees.
+
 **Prompt: Reasoning Benchmark v1**
 
-"A farmer has 17 sheep. All but 9 die. How many sheep does the farmer have left? Show your reasoning step by step before giving the final answer."
-
-Full prompt text is available in `examples/benchmark-prompts.md`.
+Full prompt text and pass criteria are documented in Chapter 6. *(Also available in `examples/benchmark-prompts.md`.)*
 
 This prompt tests natural language comprehension, not arithmetic. The common wrong answer is 8, produced by interpreting "all but 9 die" as "9 die" and computing 17 − 9 = 8. The correct interpretation is that all sheep except 9 die, leaving 9 alive.
 
@@ -1553,7 +1523,8 @@ Reasoning v1 produces a shorter response than either the Coding or Refactoring p
 
 Both models completed all three Benchmark v1 categories on a MacBook Air M5 (16 GB, macOS Tahoe) using identical methodology and LM Studio settings. The table below records confirmed measurements only.
 
-> **Figure 5.1** — Gemma 4 E4B vs Qwen3 4B visual summary.
+> **Figure 7.1** — Gemma 4 E4B vs Qwen3 4B head-to-head summary.
+> *(Asset: `assets/comparisons/gemma4-e4b-vs-qwen3-4b-head-to-head.png`)*
 
 #### Full Results Table
 
@@ -1589,7 +1560,7 @@ RAM usage and cold startup times were not collected during the sessions complete
 
 **Configuration.** Gemma 4 E4B requires no configuration changes before use — load the model and run prompts. Qwen3 4B requires Think mode to be disabled. The setting is changed once per session in LM Studio's model parameters panel. It is not a repeated overhead, but it is a step Gemma does not require. The consequences of forgetting it — prolonged generation without a result — are significant enough to warrant treating it as a mandatory pre-run check.
 
-**Runtime caveat.** Gemma runs as GGUF Q4_K_M; Qwen runs as MLX 4-bit. These formats use different inference paths on Apple Silicon. The observed speed difference reflects both the model and the runtime. MLX is optimised specifically for Apple Silicon's unified memory architecture in a way that standard GGUF inference is not. Isolating how much of the 39% gap is attributable to the model versus the format is not possible from this data alone.
+**Runtime caveat.** As discussed in Chapter 5, Gemma runs as GGUF Q4_K_M and Qwen as MLX 4-bit — different inference paths on Apple Silicon. The 39% speed difference reflects both model design and runtime. Isolating how much of the gap is attributable to each is not possible from this data.
 
 ---
 
@@ -1643,9 +1614,9 @@ Chapter 8 — Building Practical Local AI Workflows — moves from benchmark res
 
 ### Building on the Foundation
 
-Chapter 4 established the architecture that makes workflow integration possible: LM Studio as a local API server, the OpenAI-compatible endpoint, and Phoenix as a worked example of an application using that infrastructure for real work.
+Setting up LM Studio and choosing a model takes an afternoon. Using either of them consistently, across a week of real work, is the harder problem.
 
-That architecture is now assumed. This chapter focuses on what to build with it — specific, repeatable workflows that hold up in daily use rather than in isolated experiments.
+Chapter 4 established the architecture: LM Studio as a local API server, the OpenAI-compatible endpoint, and Phoenix as a concrete example of an application using that infrastructure. That architecture is assumed here. This chapter focuses on what to build with it — specific, repeatable workflows that hold up in daily use rather than in isolated experiments.
 
 ---
 
@@ -1997,8 +1968,6 @@ Fix: Set GPU Layers to Max in LM Studio's model settings. LM Studio will offload
 **Symptom:** The model begins generating tokens and the stats bar shows ongoing activity, but no final response is produced. Generation continues indefinitely.
 
 **Likely cause:** Think mode enabled on Qwen3 4B.
-
-During the initial Coding Benchmark v1 run with Qwen3 4B, Think mode was enabled. The model generated tokens extensively without converging on a final answer. The session was terminated, the model was ejected and reloaded, and Think mode was disabled before running the benchmark again.
 
 **Resolution:** Disable Think mode in LM Studio's model parameters panel before running any structured prompt with Qwen3 4B. This is a per-session setting — confirm it each time the model is loaded.
 
