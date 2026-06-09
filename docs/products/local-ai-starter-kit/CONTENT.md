@@ -1636,3 +1636,276 @@ The benchmark does not declare a winner. It establishes two things: that both mo
 Understanding what a model can do under controlled conditions is one part of working effectively with local AI. Understanding how to structure tasks, prompts, and workflows around those capabilities is the next.
 
 Chapter 8 — Building Practical Local AI Workflows — moves from benchmark results into daily use. It covers how to prompt consistently for common tasks, how to integrate local models into existing tools and processes, and what usage patterns hold up reliably on MacBook Air M5 hardware.
+
+---
+
+## Chapter 8 — Building Practical Local AI Workflows
+
+### Building on the Foundation
+
+Chapter 4 established the architecture that makes workflow integration possible: LM Studio as a local API server, the OpenAI-compatible endpoint, and Phoenix as a worked example of an application using that infrastructure for real work.
+
+That architecture is now assumed. This chapter focuses on what to build with it — specific, repeatable workflows that hold up in daily use rather than in isolated experiments.
+
+---
+
+### Workflow 1: Extending the Phoenix Workflow
+
+Phoenix handles the technical integration. The more useful question is how to use it effectively once it is running.
+
+#### Batch Processing vs. Interactive Use
+
+The most common starting pattern is interactive: a note arrives, BISHOP processes it, the result is reviewed and confirmed. This works well for small volumes.
+
+For larger batches — processing a backlog of unstructured captures, ingesting research material from a reading session, clearing an inbox at the end of a week — the same workflow applies at scale. The key difference is preparation.
+
+Effective batch processing with Phoenix:
+
+* Start with a fresh model session in LM Studio — no context carry-over from prior sessions
+* Process notes in groups of 10–20 rather than all at once, to catch any quality drift before it accumulates
+* Review BISHOP output before confirming each note rather than accepting in bulk — the model can misclassify ambiguous captures, and catching these during review takes less time than correcting them later
+
+#### Prompt Refinement
+
+BISHOP accepts refinement instructions when the initial output is not quite right. A useful cycle:
+
+1. Process the note — review the title, tags, and classification
+2. If the classification is correct but the title is too generic, ask: *"Make the title more specific — this note is about [topic]"*
+3. If the classification is wrong, correct it and ask BISHOP to re-derive the summary and tags from the corrected type
+4. If entities are missing, name them and request a revised extraction pass
+
+For clear, well-structured notes the initial result is usually sufficient. For ambiguous or sprawling captures, a single refinement prompt resolves most issues.
+
+#### Knowledge Retrieval Patterns
+
+HERMES becomes more useful as the note database grows. The search synthesis capability improves with corpus size — more notes means more material to retrieve and ground an answer in.
+
+Questions that work well:
+
+* *"What have I noted about [topic] in the past month?"*
+* *"Summarise my notes on [project]"*
+* *"What observations have I made about [concept]?"*
+
+These work because they give HERMES a bounded retrieval task. Open-ended questions with no clear search anchor produce less reliable results — HERMES performs better as a retriever than as a general-purpose reasoner.
+
+---
+
+### Workflow 2: Developer Productivity
+
+Local AI on a developer's machine has a structural advantage over cloud tools: it operates on private codebases, local files, and proprietary logic without any of that context leaving the machine. This matters less for open-source code and more for anything genuinely private.
+
+#### Code Explanation
+
+Paste an unfamiliar function or module and ask the model to explain it step by step.
+
+```
+Explain what this code does. Walk through it step by step.
+Identify any non-obvious patterns or potential issues.
+
+[paste code]
+```
+
+Gemma 4 E4B's tendency toward thorough output makes it a good fit for this task — detailed explanations are more useful here than concise ones.
+
+#### Refactoring
+
+The Refactoring Benchmark v1 prompt from this guide is a reusable template for real refactoring work. Adapt it:
+
+```
+Refactor the following code. Improve readability and remove duplication.
+Add type hints where missing. Do not change the external behaviour.
+
+[paste code]
+```
+
+The final sentence matters. Explicitly specifying that behaviour must be preserved prevents the model from introducing functional changes while restructuring. Verify the output against your test suite before committing.
+
+#### Documentation
+
+For undocumented functions or modules:
+
+```
+Write a docstring for this function. Include: what it does,
+parameters with types, return value, and at least one usage example.
+
+[paste code]
+```
+
+For larger tasks — README files, API references, module overviews — break the request into sections and process each separately. A single large documentation prompt tends to produce output that drifts in quality across sections.
+
+#### Test Generation
+
+Local AI accelerates test scaffolding for straightforward functions:
+
+```
+Write pytest test cases for this function. Cover the happy path,
+at least two edge cases, and the case where [specific condition].
+
+[paste code]
+```
+
+Treat generated tests as a starting point, not a finished suite. The model generates tests based on the visible code, not on the intended behaviour. Review each test case before including it.
+
+---
+
+### Workflow 3: Research and Learning
+
+Local AI is effective for personal learning workflows where the goal is to build understanding rather than retrieve facts.
+
+#### Working Through Technical Topics
+
+A learning workflow that produces reliable results:
+
+1. **Orientation pass** — ask for a high-level explanation without detail first. *"Give me a high-level overview of [topic] in three to four sentences."*
+2. **Targeted questions** — once oriented, ask about the specific parts that are unclear. *"What is the difference between X and Y in this context?"*
+3. **Practical examples** — ask for examples in a context that is already familiar. *"Show me how [concept] applies in a Python script."*
+4. **Synthesis check** — explain the topic back to the model in your own words and ask it to identify errors or gaps. *"Here is my understanding of [topic]. Is this correct? What am I missing?"*
+
+This sequence produces better results than asking for a comprehensive explanation upfront, which generates more content than can be absorbed in one pass.
+
+#### Comparing Sources
+
+When working with multiple documents or articles:
+
+```
+I have read two explanations of [topic]. Here is my summary of each:
+
+Summary 1: [...]
+Summary 2: [...]
+
+What are the key differences between these two explanations?
+Where do they agree?
+```
+
+This works well because the model is working from your input rather than its training data. The comparison is grounded in what you have actually read.
+
+#### Note-Assisted Research
+
+If using Phoenix alongside a research workflow, HERMES retrieval and a focused follow-up prompt create a useful cycle:
+
+1. Ask HERMES to surface relevant prior notes on the topic
+2. Take the retrieved content and paste the most relevant passages into LM Studio's chat with a synthesis prompt
+3. Use the synthesised result as the basis for a new note, which BISHOP can process and tag
+
+This produces a research workflow that compounds over time — each session builds on observations from previous ones.
+
+---
+
+### Workflow 4: Writing and Thinking
+
+Writing and thinking workflows work particularly well with local AI because the content is personal. Career observations, planning, and private journaling are not content most people want to send through a cloud service.
+
+#### Journaling and Reflection
+
+A useful pattern for processing a journal entry or daily log:
+
+```
+Here is a journal entry from today. Identify: the main themes,
+any recurring concerns, and one or two questions worth sitting with.
+
+[paste entry]
+```
+
+The goal is not to have the model rewrite the entry. The goal is to use it as a reflection prompt — the output surfaces patterns the writer may have produced but not noticed.
+
+#### Business and Career Planning
+
+For structured planning tasks:
+
+```
+Here is a rough outline of a decision I am working through:
+
+[paste outline]
+
+What are the key tradeoffs I am not explicitly addressing?
+What assumptions am I making that might not hold?
+```
+
+This prompt pattern is useful for stress-testing plans and surfacing blind spots. The model acts as a critical reader of the reasoning, not as the decision-maker.
+
+#### Idea Development
+
+For early-stage ideas that are not yet fully formed:
+
+```
+Here is a rough idea I am working on: [describe idea]
+
+Help me identify: what the core claim is, what would have to be true
+for it to work, and where the weakest assumptions are.
+```
+
+The value is in the structure the model imposes on loose thinking. A half-formed idea becomes more tractable once the core claim and key assumptions are separated out.
+
+---
+
+### Workflow 5: Building Real Projects
+
+The workflow used to build this guide is a replicable pattern for any project that combines research, documentation, and output. The structure is not specific to a guide about local AI — it applies to software tools, research notes, content series, and learning journals.
+
+```
+Define the problem clearly
+    ↓
+Research and capture observations in real time
+    ↓
+Document findings as they emerge
+    ↓
+Build iteratively, using AI at each stage
+    ↓
+Produce the output from the documented record
+```
+
+#### What each stage looks like
+
+**Define the problem before using AI.** A clear problem statement constrains every subsequent decision: which models to test, what tasks to cover, what content to include. Vague problem statements produce sprawling projects that resist completion.
+
+**Capture observations at the time they occur.** Every benchmark session for this guide produced a dated entry in `EXPERIMENT-LOG.md`, written during the session rather than reconstructed from memory later. Real-time capture is more reliable than retrospective reconstruction, and it creates a record that can be referenced throughout the project.
+
+**Let the documentation drive the output.** The chapters in this guide were written from the documented evidence — benchmark files, comparison tables, experiment logs — rather than from memory or general knowledge. Local AI assisted in drafting and refining sections, but no content was generated without a traceable source.
+
+**Use version control throughout.** Git provides a complete record of how the project evolved. For a project combining research, writing, and tooling, this makes it straightforward to trace decisions, understand what changed between sessions, and recover from mistakes.
+
+**Process outputs with local AI at each stage.** Draft documentation, refine comparisons, generate summaries of session notes — local AI is useful at every stage of the process, not just at the final output stage.
+
+The pattern works because the record and the output stay in sync. The documented observations become the evidence base for the written output. The AI assists at the task level without replacing the research or the judgement.
+
+---
+
+### Designing Your Own Workflow
+
+The most common failure mode in local AI workflows is building complexity before any usage habits exist.
+
+A workflow that is too complex to use consistently is not a workflow — it is an abandoned experiment.
+
+**Start with one use case.** Pick the task you do most often that involves any kind of writing, analysis, or organisation. Solve that one task with local AI before adding anything else.
+
+**Measure usefulness, not output quality.** A workflow is useful if you reach for it regularly. If you are not using it, the quality of the outputs is irrelevant. After two weeks, the question to ask is *"Did I use this?"* — not *"Does it produce good output?"*
+
+**Iterate when friction appears.** When a workflow falls out of use, the friction point is usually identifiable: a prompt that takes too long to type, a model that is slow enough that waiting becomes annoying, a result that requires too much editing before it is useful. Fix the specific friction point rather than rebuilding from scratch.
+
+**Add complexity only after the simple version is working.** Automation, scripts, and integrations are worth building only after a manual version of the workflow has proven useful over time. Manual workflows reveal what is actually needed. Automated workflows built before that knowledge is established tend to automate the wrong thing.
+
+---
+
+### Common Mistakes
+
+**Collecting models instead of using them.** Downloading and loading different models is easy and feels productive. It is not the same as building a workflow. Set a time boundary on model exploration sessions — they have diminishing returns faster than they appear to.
+
+**Constant switching.** Changing models, runtimes, or settings too frequently prevents a clear picture of what any single configuration is actually capable of. Use a model consistently for at least a week before deciding to switch.
+
+**Chasing benchmark numbers.** A model that scores well on a benchmark and a model that is useful in your specific workflow are not necessarily the same thing. The benchmark results in this guide measure specific tasks under specific conditions. Your workflow may involve entirely different tasks.
+
+**Building systems nobody uses.** It is easy to build an elaborate prompt pipeline that looks useful in theory but gets skipped in practice because the manual alternative is slightly less effort. Build workflows that reduce friction, not workflows that add steps in exchange for marginally better output.
+
+**Expecting too much from 4B-class models.** Gemma 4 E4B and Qwen3 4B are capable within their scope. Long-form synthesis, extended multi-step reasoning, and tasks that require broad factual knowledge can reveal the limits of small models. Knowing when to switch to a cloud model — or a larger local model if hardware allows — is part of managing a practical workflow.
+
+---
+
+### Key Takeaway
+
+Workflows are what convert a local AI setup from a curiosity into a productive tool.
+
+The benchmark results in previous chapters established that both Gemma 4 E4B and Qwen3 4B handle coding, refactoring, and reasoning tasks reliably on a MacBook Air M5. The workflows in this chapter represent how to use those capabilities consistently — in note processing, development, research, writing, and project work.
+
+The simplest workflow that gets used regularly is worth more than the most sophisticated one that gets used once.
+
+Chapter 9 — Troubleshooting Common Local AI Problems — covers the issues most likely to interrupt these workflows: models that fail to load, speed degradation, memory pressure, configuration errors, and the most common failure modes encountered when running local AI on Apple Silicon hardware.
