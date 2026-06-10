@@ -3,3 +3,9 @@
 
 # PDF build artifacts
 docs/products/**/*.pdf
+
+# Project notes — local only, not part of the product
+HANDOFF.md
+
+# Cursor canvas design workspaces — not part of the product
+*.canvas.tsx
