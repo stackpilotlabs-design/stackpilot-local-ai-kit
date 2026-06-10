@@ -2518,7 +2518,7 @@ These are the primary tools and references used in this guide. No affiliate arra
 
 ---
 
-### LM Studio
+### LM Studio {.unnumbered}
 
 **Website:** lmstudio.ai  
 **What it is:** Desktop application for downloading, managing, and running local LLMs on macOS, Windows, and Linux. Provides a chat interface, model browser, and a local OpenAI-compatible API server.  
@@ -2526,7 +2526,7 @@ These are the primary tools and references used in this guide. No affiliate arra
 
 ---
 
-### Hugging Face
+### Hugging Face {.unnumbered}
 
 **Website:** huggingface.co  
 **What it is:** The primary public repository for open-weight model files. LM Studio downloads models from Hugging Face in the background.  
@@ -2534,21 +2534,21 @@ These are the primary tools and references used in this guide. No affiliate arra
 
 ---
 
-### Google DeepMind — Gemma
+### Google DeepMind — Gemma {.unnumbered}
 
 **What it is:** The model family from Google DeepMind that includes Gemma 4 E4B, one of the two primary models covered in this guide.  
 **Where to find updates:** Google DeepMind's research blog and Hugging Face model page for Gemma.
 
 ---
 
-### Alibaba Cloud — Qwen3
+### Alibaba Cloud — Qwen3 {.unnumbered}
 
 **What it is:** The model family from Alibaba Cloud that includes Qwen3 4B, the second primary model covered in this guide.  
 **Where to find updates:** Qwen model repository on Hugging Face.
 
 ---
 
-### OpenAI API Reference
+### OpenAI API Reference {.unnumbered}
 
 **Website:** platform.openai.com/docs/api-reference  
 **Why it is relevant:** LM Studio's local server implements an OpenAI-compatible API surface. The OpenAI API reference documents the request and response format that LM Studio's `/v1/chat/completions` endpoint mirrors.
@@ -2586,19 +2586,19 @@ These are products in various stages of planning or development. No publication 
 
 ---
 
-### Prompt Engineering for Developers
+### Prompt Engineering for Developers {.unnumbered}
 
 A practical guide to writing, testing, and iterating on prompts for code generation, refactoring, and documentation tasks. Focused on repeatable patterns and measurable output quality, not abstract theory.
 
 ---
 
-### Local AI on Apple Silicon — Model Comparison Update
+### Local AI on Apple Silicon — Model Comparison Update {.unnumbered}
 
 A focused update covering additional models as they become available at the 4B–8B parameter class and run well on 16 GB unified memory. Structured as a benchmark supplement to the Local AI Starter Kit rather than a standalone guide.
 
 ---
 
-### Building a Local Second Brain
+### Building a Local Second Brain {.unnumbered}
 
 A technical guide to designing and building a note capture, processing, and retrieval system that runs entirely on local hardware. Uses the Phoenix application as a reference implementation and extends it into a generalisable architecture.
 

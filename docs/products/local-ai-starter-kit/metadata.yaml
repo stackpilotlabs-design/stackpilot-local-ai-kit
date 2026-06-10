@@ -42,6 +42,13 @@ citecolor: "black"
 # Code blocks
 highlight-style: monochrome
 
+# Code block line wrapping — prevents long lines overflowing the right margin
+# fvextra patches both highlighted (Highlighting) and plain (verbatim) code blocks
+header-includes:
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+  - \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
+
 # Header/footer via geometry (configured in build command)
 pagestyle: plain
 ---
