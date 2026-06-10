@@ -1,0 +1,42 @@
+---
+title: "Local AI Starter Kit for Mac — Free Preview"
+subtitle: "A Practical Guide to Running, Benchmarking, and Choosing Local AI Models on Apple Silicon"
+author: "StackPilot Labs"
+version: "1.0"
+date: "June 2026"
+lang: "en"
+
+documentclass: article
+papersize: a4
+fontsize: 11pt
+linestretch: 1.4
+margin-left: 2.5cm
+margin-right: 2.5cm
+margin-top: 3cm
+margin-bottom: 3cm
+
+mainfont: "Charter"
+sansfont: "Helvetica Neue"
+monofont: "Menlo"
+monofontoptions:
+  - Scale=0.85
+
+toc: false
+toc-depth: 1
+toc-title: "Contents"
+number-sections: false
+
+title-page: false
+
+colorlinks: true
+linkcolor: "black"
+urlcolor: "black"
+citecolor: "black"
+
+highlight-style: monochrome
+
+header-includes:
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+  - \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
+---

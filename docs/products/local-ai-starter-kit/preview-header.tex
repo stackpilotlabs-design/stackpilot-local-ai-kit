@@ -1,0 +1,14 @@
+\makeatletter
+\renewcommand{\maketitle}{}
+\makeatother
+\usepackage{caption}
+\captionsetup{labelformat=empty,textformat=empty,labelsep=none}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\small FREE PREVIEW --- Local AI Starter Kit for Mac}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\makeatletter
+\let\ps@plain\ps@fancy
+\makeatother

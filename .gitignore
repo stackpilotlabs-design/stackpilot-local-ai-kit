@@ -4,6 +4,11 @@
 # PDF build artifacts
 docs/products/**/*.pdf
 
+# Free preview edition — generated intermediates and QA captures
+docs/products/local-ai-starter-kit/preview-debug.tex
+docs/products/local-ai-starter-kit/preview-full.tex
+docs/products/local-ai-starter-kit/preview-*-page.png
+
 # Project notes — local only, not part of the product
 HANDOFF.md
 
