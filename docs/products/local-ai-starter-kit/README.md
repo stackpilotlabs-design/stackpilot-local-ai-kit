@@ -1,50 +1,21 @@
 # Local AI Starter Kit for Mac
 
-A beginner-friendly guide for running modern AI models locally on Apple Silicon Macs using LM Studio and Ollama.
+A practical guide to running, benchmarking, and choosing local AI models on Apple Silicon.
 
-This product is being developed as part of the StackPilot Labs Local AI Benchmarking Project.
+StackPilot Labs · v1.0 · Published on Gumroad
 
-## Product Status
+## Free Preview
 
-Current Version: Draft v1.0
+Download the free 15-page preview:
 
-Completed:
-- ✓ Chapter 1
-- ✓ Chapter 2
-- ✓ Chapter 3
-- ✓ Chapter 4
-- ✓ Chapter 5
-- ✓ Chapter 6
-- ✓ Chapter 7
-- ✓ Chapter 8
-- ✓ Chapter 9
-- ✓ Chapter 10
+[Local AI Starter Kit for Mac — Free Preview](https://stackpilot1.gumroad.com/l/local-ai-starter-kit-preview)
 
-Progress:
-10 / 10 Chapters Complete
+## Full Guide
 
-Remaining:
-- ⬜ Prompt pack creation pending
-- ⬜ Gumroad packaging pending
-- ⬜ First release pending
+Purchase the complete 94-page guide ($19 launch price):
 
-## Product Outline
+[Local AI Starter Kit for Mac](https://stackpilot1.gumroad.com/l/local-ai-starter-kit-mac)
 
-See: [OUTLINE.md](OUTLINE.md)
+## Repository
 
-## Planned Contents
-
-- Local AI fundamentals
-- LM Studio setup
-- Ollama setup
-- Model selection guidance
-- Real benchmark results
-- Troubleshooting guide
-- Prompt pack
-
-## Target Audience
-
-- Developers
-- Students
-- Technical professionals
-- AI enthusiasts
+This folder contains the v1.0 manuscript source, build configuration, and Gumroad copy. Release details: [VERSION.md](VERSION.md).
