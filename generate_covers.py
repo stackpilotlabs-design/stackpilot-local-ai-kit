@@ -8,7 +8,9 @@ Run from repo root:
 
 Output: assets/covers/
   cover-v1.png        1280 × 1920  PDF cover / Gumroad product cover
+  cover-v1-preview.png 1280 × 1920  Free preview edition cover (adds FREE PREVIEW)
   cover-square.png    1080 × 1080  X (Twitter) / Gumroad social share
+  cover-square-preview.png 1080 × 1080  Free preview square cover
   cover-linkedin.png  1080 × 1350  LinkedIn image post (4:5)
   cover-og.png        1200 × 628   OG link preview
 """
@@ -49,6 +51,7 @@ FS_BRAND  = 43    # JBM SemiBold — brand line "STACKPILOT LABS"
 FS_PROMPT = 118   # JBM Bold    — "$_" prompt accent
 FS_TITLE  = 160   # InterDisplay SemiBold — "Local AI", "Starter Kit"
 FS_PLAT   = 120   # Inter SemiBold — "for Mac" (platform qualifier, ~75% of title)
+FS_PREVIEW = 72   # JBM SemiBold — "FREE PREVIEW" badge line
 FS_SUB    = 43    # JBM Regular — subtitle (2 lines)
 FS_BLBL   = 37    # JBM Regular — "BENCHMARK RESULTS" label
 FS_BENCH  = 46    # JBM Regular / Bold / SemiBold — benchmark row text
@@ -68,7 +71,8 @@ Y_PROMPT = 152
 Y_TITLE1 = 440     # "Local AI"    — zone 3, padded to center block
 Y_TITLE2 = 622     # "Starter Kit" — Y_TITLE1 + FS_TITLE + 22
 Y_PLAT   = 806     # "for Mac"     — Y_TITLE2 + FS_TITLE + 24
-Y_SUB1   = 1066    # subtitle line 1 — zone 4
+Y_PREVIEW = 952    # "FREE PREVIEW" — preview edition only
+Y_SUB1   = 1066    # subtitle line 1 — zone 4 (preview: +78)
 Y_SUB2   = 1120    # subtitle line 2 — + FS_SUB + 11
 Y_SEP    = 1308    # separator
 Y_BLBL   = 1338    # "BENCHMARK RESULTS"
@@ -107,6 +111,7 @@ def load_fonts(sx=1.0):
         "prompt" : ImageFont.truetype(JBM_B,   sz(FS_PROMPT)),
         "title"  : ImageFont.truetype(INT_D,   sz(FS_TITLE)),
         "plat"   : ImageFont.truetype(INT_SB,  sz(FS_PLAT)),
+        "preview": ImageFont.truetype(JBM_SB,  sz(FS_PREVIEW)),
         "sub"    : ImageFont.truetype(JBM_REG, sz(FS_SUB)),
         "blbl"   : ImageFont.truetype(JBM_REG, sz(FS_BLBL)),
         "bench"  : ImageFont.truetype(JBM_REG, sz(FS_BENCH)),
@@ -118,7 +123,7 @@ def load_fonts(sx=1.0):
 
 # ── Render functions ───────────────────────────────────────────────────────────
 
-def render_cover(output_w=W, output_h=H, include_bench=True) -> Image.Image:
+def render_cover(output_w=W, output_h=H, include_bench=True, preview=False) -> Image.Image:
     """
     Render the full cover at any size by proportionally scaling all metrics.
     Default is the production 1280 × 1920 canvas.
@@ -151,16 +156,24 @@ def render_cover(output_w=W, output_h=H, include_bench=True) -> Image.Image:
     d.text((lx(LEFT), ly(Y_PLAT)),   "for Mac",
            font=f["plat"],  fill=WHITE, anchor="lt")
 
+    # Preview edition — badge line below title block
+    y_shift = 0
+    if preview:
+        preview_track = max(1, int(f["preview"].size * 0.10))
+        draw_tracked(d, lx(LEFT), ly(Y_PREVIEW),
+                     "FREE PREVIEW", f["preview"], GREEN, tracking=preview_track)
+        y_shift = 78
+
     # Zone 4 — Subtitle
-    d.text((lx(LEFT), ly(Y_SUB1)),
+    d.text((lx(LEFT), ly(Y_SUB1 + y_shift)),
            "A Practical Guide to Running, Benchmarking,",
            font=f["sub"], fill=SUBTITLE, anchor="lt")
-    d.text((lx(LEFT), ly(Y_SUB2)),
+    d.text((lx(LEFT), ly(Y_SUB2 + y_shift)),
            "and Choosing Local AI Models on Apple Silicon",
            font=f["sub"], fill=SUBTITLE, anchor="lt")
 
     # Zone 5 — Separator rule
-    d.line([(lx(LEFT), ly(Y_SEP)), (lx(RIGHT), ly(Y_SEP))],
+    d.line([(lx(LEFT), ly(Y_SEP + y_shift)), (lx(RIGHT), ly(Y_SEP + y_shift))],
            fill=SEPARATOR, width=max(1, round(sy)))
 
     if not include_bench:
@@ -168,22 +181,22 @@ def render_cover(output_w=W, output_h=H, include_bench=True) -> Image.Image:
 
     # Zone 6 — Benchmark strip
     blbl_track = max(1, int(f["blbl"].size * 0.10))
-    draw_tracked(d, lx(LEFT), ly(Y_BLBL),
+    draw_tracked(d, lx(LEFT), ly(Y_BLBL + y_shift),
                  "BENCHMARK RESULTS", f["blbl"], BENCH_LBL, tracking=blbl_track)
 
     # Gemma 4 E4B row
-    d.text((lx(X_BULLET), ly(Y_GEMMA)), "\u00b7",         font=f["bench"],   fill=BENCH_BUL, anchor="lt")
-    d.text((lx(X_MODEL),  ly(Y_GEMMA)), "Gemma 4 E4B",    font=f["bench"],   fill=BENCH_MDL, anchor="lt")
-    d.text((lx(X_SPEED),  ly(Y_GEMMA)), "33.6",           font=f["bench_b"], fill=WHITE,      anchor="lt")
-    d.text((lx(X_UNIT_G), ly(Y_GEMMA)), "tok/s",          font=f["bench"],   fill=BENCH_UNIT, anchor="lt")
-    d.text((lx(X_PASS),   ly(Y_GEMMA)), "PASS",           font=f["bench_s"], fill=GREEN,      anchor="lt")
+    d.text((lx(X_BULLET), ly(Y_GEMMA + y_shift)), "\u00b7",         font=f["bench"],   fill=BENCH_BUL, anchor="lt")
+    d.text((lx(X_MODEL),  ly(Y_GEMMA + y_shift)), "Gemma 4 E4B",    font=f["bench"],   fill=BENCH_MDL, anchor="lt")
+    d.text((lx(X_SPEED),  ly(Y_GEMMA + y_shift)), "33.6",           font=f["bench_b"], fill=WHITE,      anchor="lt")
+    d.text((lx(X_UNIT_G), ly(Y_GEMMA + y_shift)), "tok/s",          font=f["bench"],   fill=BENCH_UNIT, anchor="lt")
+    d.text((lx(X_PASS),   ly(Y_GEMMA + y_shift)), "PASS",           font=f["bench_s"], fill=GREEN,      anchor="lt")
 
     # Qwen3 4B row
-    d.text((lx(X_BULLET), ly(Y_QWEN3)), "\u00b7",         font=f["bench"],   fill=BENCH_BUL, anchor="lt")
-    d.text((lx(X_MODEL),  ly(Y_QWEN3)), "Qwen3 4B",       font=f["bench"],   fill=BENCH_MDL, anchor="lt")
-    d.text((lx(X_SPEED),  ly(Y_QWEN3)), "46\u201350",     font=f["bench_b"], fill=WHITE,      anchor="lt")
-    d.text((lx(X_UNIT_Q), ly(Y_QWEN3)), "tok/s",          font=f["bench"],   fill=BENCH_UNIT, anchor="lt")
-    d.text((lx(X_PASS),   ly(Y_QWEN3)), "PASS",           font=f["bench_s"], fill=GREEN,      anchor="lt")
+    d.text((lx(X_BULLET), ly(Y_QWEN3 + y_shift)), "\u00b7",         font=f["bench"],   fill=BENCH_BUL, anchor="lt")
+    d.text((lx(X_MODEL),  ly(Y_QWEN3 + y_shift)), "Qwen3 4B",       font=f["bench"],   fill=BENCH_MDL, anchor="lt")
+    d.text((lx(X_SPEED),  ly(Y_QWEN3 + y_shift)), "46\u201350",     font=f["bench_b"], fill=WHITE,      anchor="lt")
+    d.text((lx(X_UNIT_Q), ly(Y_QWEN3 + y_shift)), "tok/s",          font=f["bench"],   fill=BENCH_UNIT, anchor="lt")
+    d.text((lx(X_PASS),   ly(Y_QWEN3 + y_shift)), "PASS",           font=f["bench_s"], fill=GREEN,      anchor="lt")
 
     # Zone 8 — Version (bottom-right, right-aligned to RIGHT margin)
     ver_text = "v1.0 \u00b7 June 2026"
@@ -298,12 +311,24 @@ def main():
     cover.save(str(p), "PNG", compress_level=1)
     print(f"  \u2713  cover-v1.png          {W} \u00d7 {H}")
 
+    # 1b — cover-v1-preview.png  1280 × 1920  (free preview edition)
+    cover_preview = render_cover(W, H, include_bench=True, preview=True)
+    p = out_dir / "cover-v1-preview.png"
+    cover_preview.save(str(p), "PNG", compress_level=1)
+    print(f"  \u2713  cover-v1-preview.png  {W} \u00d7 {H}")
+
     # 2 — cover-square.png  1080 × 1080
     # Crop full-width 1280 × 1280 square from top of cover, resize to 1080 × 1080
     sq = cover.crop((0, 0, W, W)).resize((1080, 1080), Image.LANCZOS)
     p  = out_dir / "cover-square.png"
     sq.save(str(p), "PNG", compress_level=1)
     print(f"  \u2713  cover-square.png      1080 \u00d7 1080")
+
+    # 2b — cover-square-preview.png  1080 × 1080  (free preview edition)
+    sq_preview = cover_preview.crop((0, 0, W, W)).resize((1080, 1080), Image.LANCZOS)
+    p = out_dir / "cover-square-preview.png"
+    sq_preview.save(str(p), "PNG", compress_level=1)
+    print(f"  \u2713  cover-square-preview.png  1080 \u00d7 1080")
 
     # 3 — cover-linkedin.png  1080 × 1350 (4:5)
     # Crop 1280 × 1600 from top of cover (includes benchmark strip), resize
